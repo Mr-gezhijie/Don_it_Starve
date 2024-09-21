@@ -43,6 +43,18 @@ configuration_options = {
         hover="Modify binding key「修改绑定键」"
     },
 
+    -- 是否启动
+    {
+        name="ae_enablemod",
+        label="Enable mod?",
+        -- longlabel="This allows you to completely disable the mod from in-game. No use outside of the in-game menu.",
+        options = {
+            {description="No",data=0},
+            {description="Yes",data=1}
+        },
+        hover="This has no use outside of the in-game settings menu.",
+        default=1
+    },
 
     {
         name="ae_lightindark",

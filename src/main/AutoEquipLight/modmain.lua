@@ -123,14 +123,14 @@ local rangedWeaponsByPriority = {
 --  正在修改这个
 local modOptions = {
     ENABLED = GetModConfigData("ae_enablemod") > 0,
-    IGNORE_RESTRICTIONS = GetModConfigData("autoequipignorerestrictions") > 0,
-    IGNORE_SAPS = GetModConfigData("ae_alwaysignoresaps") > 0,
-
-    TRY_PICKUP_NEARBY_TOOLS = GetModConfigData("ae_use_nearby_tools") > 0,
-    SWITCH_TOOLS_AUTO = GetModConfigData("ae_switchtools") == 1 or GetModConfigData("ae_switchtools") == 2,
-    SWITCH_TOOLS_MOUSE = GetModConfigData("ae_switchtools") == 1 or GetModConfigData("ae_switchtools") == 3,
-    EQUIP_WEAPONS = GetModConfigData("ae_equipweapon") > 0,
-    CRITTERS_WITH_BOOMERANG = GetModConfigData("ae_boomcritters") > 0,
+    --IGNORE_RESTRICTIONS = GetModConfigData("autoequipignorerestrictions") > 0,
+    --IGNORE_SAPS = GetModConfigData("ae_alwaysignoresaps") > 0,
+    --
+    --TRY_PICKUP_NEARBY_TOOLS = GetModConfigData("ae_use_nearby_tools") > 0,
+    --SWITCH_TOOLS_AUTO = GetModConfigData("ae_switchtools") == 1 or GetModConfigData("ae_switchtools") == 2,
+    --SWITCH_TOOLS_MOUSE = GetModConfigData("ae_switchtools") == 1 or GetModConfigData("ae_switchtools") == 3,
+    --EQUIP_WEAPONS = GetModConfigData("ae_equipweapon") > 0,
+    --CRITTERS_WITH_BOOMERANG = GetModConfigData("ae_boomcritters") > 0,
 
     -- 创建
     CREATE_LIGHT_IN_DARK = GetModConfigData("ae_lightindark") > 1,
@@ -138,18 +138,18 @@ local modOptions = {
     EQUIP_LIGHT_IN_DARK = GetModConfigData("ae_lightindark") > 0,
 
     ECO_MODE = true,
-    CRAFT_TOOLS_MOUSE = GetModConfigData("ae_crafttools_mouse") > 0,
-    CRAFT_TOOLS_MOUSE_GOLDEN = GetModConfigData("ae_crafttools_mouse") > 1,
-    CRAFT_TOOLS_AUTO = GetModConfigData("ae_crafttools") > 0,
-    CRAFT_TOOLS_AUTO_GOLDEN = GetModConfigData("ae_crafttools") > 1,
-
+    --CRAFT_TOOLS_MOUSE = GetModConfigData("ae_crafttools_mouse") > 0,
+    --CRAFT_TOOLS_MOUSE_GOLDEN = GetModConfigData("ae_crafttools_mouse") > 1,
+    --CRAFT_TOOLS_AUTO = GetModConfigData("ae_crafttools") > 0,
+    --CRAFT_TOOLS_AUTO_GOLDEN = GetModConfigData("ae_crafttools") > 1,
+    --
     IGNORE_TRAPS = false,
     REACTIVATE_TRAPS = false,
-
-    REPLANT_TREES = GetModConfigData("ae_replanttrees") > 0,
-    REFUEL_FIRES = GetModConfigData("ae_refuelfires") > 0,
-    REFUEL_FIRES_PRIORITIZE = GetModConfigData("ae_refuelfires"),
-    REPAIR_WALLS = GetModConfigData("ae_repairwalls") > 0
+    --
+    --REPLANT_TREES = GetModConfigData("ae_replanttrees") > 0,
+    --REFUEL_FIRES = GetModConfigData("ae_refuelfires") > 0,
+    --REFUEL_FIRES_PRIORITIZE = GetModConfigData("ae_refuelfires"),
+    --REPAIR_WALLS = GetModConfigData("ae_repairwalls") > 0
 };
 
 local function IMS( plyctrl )
@@ -168,7 +168,8 @@ local STARTSCALE = 0.25
 local NORMSCALE = 1
 local controls = nil
 
-local KEYBOARDTOGGLEKEY = GetModConfigData("autoequipopeningamesettings") or "C"
+-- 自定义键位
+local KEYBOARDTOGGLEKEY = GetModConfigData("autoequipopeningamesettings") or "L"
 if type(KEYBOARDTOGGLEKEY) == "string" then
     KEYBOARDTOGGLEKEY = KEYBOARDTOGGLEKEY:lower():byte()
 end
@@ -181,6 +182,7 @@ for i, v in ipairs(TARGET_EXCLUDE_TAGS) do
     table.insert(HAUNT_TARGET_EXCLUDE_TAGS, v)
 end
 
+-- 有被调用
 local function IsDefaultScreen()
     return GLOBAL.TheFrontEnd:GetActiveScreen().name:find("HUD") ~= nil
             and not(GLOBAL.ThePlayer.HUD:IsControllerCraftingOpen() or GLOBAL.ThePlayer.HUD:IsControllerInventoryOpen())
@@ -193,7 +195,7 @@ local function ShowSettingsMenu( controls )
     GLOBAL.TheFrontEnd:PushScreen(AASC(controls))
 end
 
-
+-- 用于装备工具或者武器的
 local function DoEquip( inst, tool )
     if( inst == nil or inst.components == nil or inst.components.playercontroller == nil or tool == nil ) then return end
 
@@ -209,6 +211,7 @@ local function DoEquip( inst, tool )
     end
 end
 
+-- 用于卸下工具或者武器的
 local function DoUnequip( plcotrl, force )
     if( plcotrl and plcotrl.inst and plcotrl.inst.replica and plcotrl.inst.replica.inventory ) then -- plcotrl.autoequip_lastequipped ~= nil
         if letsDoDebug then print("- Unequipping tool/weapon") end
@@ -218,10 +221,12 @@ local function DoUnequip( plcotrl, force )
     end
 end
 
+-- 查看库存用途
 local function GetInventory( inst )
     return ( inst.components and inst.components.playercontroller and inst.components.inventory ) or ( inst.replica and inst.replica.inventory )
 end
 
+ -- 查找物品
 local function CustomFindItem( inst, inv, check )
     local items = inv and inv.GetItems and inv:GetItems() or inv.itemslots or nil
     if not inst or not inv or not check or not items then if letsDoDebug then print("Something went wrong with the inventory...") end return nil end
@@ -257,44 +262,45 @@ local function CustomFindItem( inst, inv, check )
     return zeItem
 end
 
-local function CustomFindItems( inst, inv, check )
-    if not inst or not inv or not check or ( ( not inv.GetItems or not inv:GetItems() ) and not inv.itemslots ) then if letsDoDebug then print("Something went wrong with the inventory...") end return nil end
-    local items = inv.GetItems and inv:GetItems() or inv.itemslots
-    local zeItem = {}
+--local function CustomFindItems( inst, inv, check )
+--    if not inst or not inv or not check or ( ( not inv.GetItems or not inv:GetItems() ) and not inv.itemslots ) then if letsDoDebug then print("Something went wrong with the inventory...") end return nil end
+--    local items = inv.GetItems and inv:GetItems() or inv.itemslots
+--    local zeItem = {}
+--
+--    for k,v in pairs(items) do
+--        if check(v) then
+--            table.insert(zeItem,v)
+--        end
+--    end
+--
+--    if inv and inv.GetOverflowContainer then
+--        items = ( inv:GetOverflowContainer() and inv:GetOverflowContainer().GetItems and inv:GetOverflowContainer():GetItems() ) or ( inv:GetOverflowContainer() and inv:GetOverflowContainer().slots ) or nil
+--        if items then
+--            for k,v in pairs(items) do
+--                if check(v) then
+--                    table.insert(zeItem,v)
+--                end
+--            end
+--        end
+--    end
+--
+--    return zeItem
+--end
 
-    for k,v in pairs(items) do
-        if check(v) then
-            table.insert(zeItem,v)
-        end
-    end
+--local function FindTool(inst, inventory, action, checkbp, canswitch )
+--    if( not canswitch ) then
+--        return nil;
+--    end
+--    return ( inventory and ( inventory.GetItems or inventory.itemslots ) and CustomFindItem( inst, inventory, function(item)
+--        return item:HasTag(action.id.."_tool") and ( not checkbp or ( checkbp and checkbp(item) ) )
+--    end) ) or ( inventory and inventory.FindItem and inventory:FindItem(function(item)
+--        return item:HasTag(action.id.."_tool") and ( not checkbp or ( checkbp and checkbp(item) ) )
+--    end) ) or ( inventory and inventory.GetOverflowContainer and inventory:GetOverflowContainer() and ( inventory:GetOverflowContainer().GetItems or inventory:GetOverflowContainer().itemslots ) and CustomFindItem( inst, inventory:GetOverflowContainer(), function(item)
+--        return item:HasTag(action.id.."_tool") and ( not checkbp or ( checkbp and checkbp(item) ) )
+--    end) ) or nil
+--end
 
-    if inv and inv.GetOverflowContainer then
-        items = ( inv:GetOverflowContainer() and inv:GetOverflowContainer().GetItems and inv:GetOverflowContainer():GetItems() ) or ( inv:GetOverflowContainer() and inv:GetOverflowContainer().slots ) or nil
-        if items then
-            for k,v in pairs(items) do
-                if check(v) then
-                    table.insert(zeItem,v)
-                end
-            end
-        end
-    end
-
-    return zeItem
-end
-
-local function FindTool(inst, inventory, action, checkbp, canswitch )
-    if( not canswitch ) then
-        return nil;
-    end
-    return ( inventory and ( inventory.GetItems or inventory.itemslots ) and CustomFindItem( inst, inventory, function(item)
-        return item:HasTag(action.id.."_tool") and ( not checkbp or ( checkbp and checkbp(item) ) )
-    end) ) or ( inventory and inventory.FindItem and inventory:FindItem(function(item)
-        return item:HasTag(action.id.."_tool") and ( not checkbp or ( checkbp and checkbp(item) ) )
-    end) ) or ( inventory and inventory.GetOverflowContainer and inventory:GetOverflowContainer() and ( inventory:GetOverflowContainer().GetItems or inventory:GetOverflowContainer().itemslots ) and CustomFindItem( inst, inventory:GetOverflowContainer(), function(item)
-        return item:HasTag(action.id.."_tool") and ( not checkbp or ( checkbp and checkbp(item) ) )
-    end) ) or nil
-end
-
+ -- 不敢动--------------------------------------------------------
 local function DoMatch( tab, value )
     for k,v in pairs(tab) do
         if( v and value and v == value ) then return true end
@@ -467,6 +473,7 @@ local function DoAutoEquipItem( playercontroller, tool, deta )
     end
 end
 
+-- 自动装备最佳武器
 local function AutoEquipBestWeapon(playercontroller, target, isForced, bufferedaction)
     local bestweapon
     local isranged
@@ -493,7 +500,7 @@ local function AutoEquipBestWeapon(playercontroller, target, isForced, buffereda
     AutoEquipItem(playercontroller, bufferedaction, isranged)
 end
 
--- 有调用
+-- 自动装备和创建光源操作
 local tookLightOut = nil
 local firstCheckedForDarkness = nil
 local function CheckIfInDarkness( inst )
@@ -541,6 +548,7 @@ end
 
 local CreateEntity = GLOBAL.CreateEntity
 
+ -- 有被调用
 local function UpdateTreePlacer( info, doremove )
     if(doremove and forcePlantSaplingPlacer) then
         forcePlantSaplingPlacer:Remove()
@@ -623,6 +631,7 @@ local function OnUpdate(playercontroller, dt)
     playercontroller.inst.autoequip_prioNextAct = nil
 end
 
+-- 关于生火
 local function GenerateNewBufferedAction( playercontroller, doforce, ignore_targets, musthave, donthave )
     local successflag, retvalue = pcall(Backup_GetActionButtonAction, playercontroller, doforce or nil, ignore_targets or nil, musthave or nil, donthave or nil)
     if( not successflag ) then
@@ -634,409 +643,410 @@ local function GenerateNewBufferedAction( playercontroller, doforce, ignore_targ
 end
 
 local alreadyCheckedMods = {}
-local function CustomCheckForMod( lemodname )
-    if letsDoDebug then print("Checking for mod:",lemodname) end
-
-    if( alreadyCheckedMods[lemodname] ~= nil ) then
-
-        return alreadyCheckedMods[lemodname]
-    elseif( alreadyCheckedMods[lemodname] == nil ) then
-        local KnownModIndex = KnownModIndex or GLOBAL.KnownModIndex
-        alreadyCheckedMods[lemodname] = ( ( KnownModIndex:GetModActualName(lemodname) and true ) or false )
-
-        return alreadyCheckedMods[lemodname]
-    end
-
-    return false
-end
+--local function CustomCheckForMod( lemodname )
+--    if letsDoDebug then print("Checking for mod:",lemodname) end
+--
+--    if( alreadyCheckedMods[lemodname] ~= nil ) then
+--
+--        return alreadyCheckedMods[lemodname]
+--    elseif( alreadyCheckedMods[lemodname] == nil ) then
+--        local KnownModIndex = KnownModIndex or GLOBAL.KnownModIndex
+--        alreadyCheckedMods[lemodname] = ( ( KnownModIndex:GetModActualName(lemodname) and true ) or false )
+--
+--        return alreadyCheckedMods[lemodname]
+--    end
+--
+--    return false
+--end
 
 local RPC = GLOBAL.RPC
 local SendRPCToServer = GLOBAL.SendRPCToServer
 
-local function DoCustomModifications( buffered, playercontroller, ignore )
-    if not buffered or not buffered.action or not buffered.target or not buffered.target.prefab then if letsDoDebug then print("Eh, not all needed info was here", buffered,buffered.action,buffered.target,buffered.target.prefab) end return end
-    if letsDoDebug then print("= Doing custom modifications:", buffered,buffered.action,buffered.target,buffered.target.prefab) end
-    if( buffered.target.prefab == "trap_teeth" and buffered.action == ACTIONS.PICKUP ) then
-        if( buffered.target:HasTag("minesprung") ) then
-            buffered.action = ACTIONS.RESETMINE
-            local position = TheInput:GetWorldPosition()
-            local controlmods = playercontroller:EncodeControlMods()
-            buffered.preview_cb = function()
-                SendRPCToServer(RPC.RightClick, buffered.action.code, position.x, position.z, buffered.target, false, controlmods, nil, buffered.action.mod_name)
-            end
-
-            playercontroller:DoAction(buffered)
-
-            return "end"
-        elseif( not buffered.target:HasTag("minesprung") and not ignore and modOptions.IGNORE_TRAPS ) then
-            if letsDoDebug then print("Finding new buffer...") end
-            local x, y, z = playercontroller.inst.Transform:GetWorldPosition()
-            local ignoreTraps = TheSim:FindEntities(x, y, z, 8, nil, {"trapsprung","minesprung"}, {"trap"})
-            return GenerateNewBufferedAction(playercontroller, nil, ignoreTraps)
-        end
-    elseif( buffered.target.prefab == "trap" and buffered.action == ACTIONS.PICKUP and not ignore and modOptions.IGNORE_TRAPS ) then
-        if letsDoDebug then print("Finding new buffer...") end
-        local x, y, z = playercontroller.inst.Transform:GetWorldPosition()
-        local ignoreTraps = TheSim:FindEntities(x, y, z, 8, nil, {"trapsprung","minesprung"}, {"trap"})
-        return GenerateNewBufferedAction(playercontroller, nil, ignoreTraps)
-
-    elseif( buffered.action == ACTIONS.PICK and ( (buffered.target.prefab == "grass") or (buffered.target.prefab == "sapling") or (buffered.target.prefab == "reeds") ) and CustomCheckForMod("Scythestest") and not ignore ) then
-        if letsDoDebug then print("Finding new buffer...") end
-
-        local tool
-        if( inst.replica and inst.replica.inventory and inst.replica.inventory.GetEquippedItem and inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) ) then
-            tool = inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
-        elseif( inst.components and inst.components.inventory ) then
-            tool = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
-        end
-        if ( not tool or ( tool and not tool:HasTag("mower") ) ) and ( inst.components and inst.components.playercontroller ) then
-
-            local thetool = CustomFindItem(inst, GetInventory(inst), function(itm) return itm:HasTag("mower") end)
-            if thetool then
-                if letsDoDebug then print("Force equipping sychte") end
-
-                DoAutoEquipItem(inst.components.playercontroller, thetool, doonsuccess )
-                buffered.invobject = thetool
-                return buffered
-            end
-        else
-            if letsDoDebug then print("Already has sychte equipped") end
-        end
-
-    elseif( buffered.target.prefab and table.contains(aa_saplingTypes,buffered.target.prefab) and buffered.action == ACTIONS.DIG and not ignore and modOptions.IGNORE_SAPS ) then
-        return false
-    end
-    return buffered
-end
+--local function DoCustomModifications( buffered, playercontroller, ignore )
+--    if not buffered or not buffered.action or not buffered.target or not buffered.target.prefab then if letsDoDebug then print("Eh, not all needed info was here", buffered,buffered.action,buffered.target,buffered.target.prefab) end return end
+--    if letsDoDebug then print("= Doing custom modifications:", buffered,buffered.action,buffered.target,buffered.target.prefab) end
+--    if( buffered.target.prefab == "trap_teeth" and buffered.action == ACTIONS.PICKUP ) then
+--        if( buffered.target:HasTag("minesprung") ) then
+--            buffered.action = ACTIONS.RESETMINE
+--            local position = TheInput:GetWorldPosition()
+--            local controlmods = playercontroller:EncodeControlMods()
+--            buffered.preview_cb = function()
+--                SendRPCToServer(RPC.RightClick, buffered.action.code, position.x, position.z, buffered.target, false, controlmods, nil, buffered.action.mod_name)
+--            end
+--
+--            playercontroller:DoAction(buffered)
+--
+--            return "end"
+--        elseif( not buffered.target:HasTag("minesprung") and not ignore and modOptions.IGNORE_TRAPS ) then
+--            if letsDoDebug then print("Finding new buffer...") end
+--            local x, y, z = playercontroller.inst.Transform:GetWorldPosition()
+--            local ignoreTraps = TheSim:FindEntities(x, y, z, 8, nil, {"trapsprung","minesprung"}, {"trap"})
+--            return GenerateNewBufferedAction(playercontroller, nil, ignoreTraps)
+--        end
+--    elseif( buffered.target.prefab == "trap" and buffered.action == ACTIONS.PICKUP and not ignore and modOptions.IGNORE_TRAPS ) then
+--        if letsDoDebug then print("Finding new buffer...") end
+--        local x, y, z = playercontroller.inst.Transform:GetWorldPosition()
+--        local ignoreTraps = TheSim:FindEntities(x, y, z, 8, nil, {"trapsprung","minesprung"}, {"trap"})
+--        return GenerateNewBufferedAction(playercontroller, nil, ignoreTraps)
+--
+--    elseif( buffered.action == ACTIONS.PICK and ( (buffered.target.prefab == "grass") or (buffered.target.prefab == "sapling") or (buffered.target.prefab == "reeds") ) and CustomCheckForMod("Scythestest") and not ignore ) then
+--        if letsDoDebug then print("Finding new buffer...") end
+--
+--        local tool
+--        if( inst.replica and inst.replica.inventory and inst.replica.inventory.GetEquippedItem and inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) ) then
+--            tool = inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+--        elseif( inst.components and inst.components.inventory ) then
+--            tool = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+--        end
+--        if ( not tool or ( tool and not tool:HasTag("mower") ) ) and ( inst.components and inst.components.playercontroller ) then
+--
+--            local thetool = CustomFindItem(inst, GetInventory(inst), function(itm) return itm:HasTag("mower") end)
+--            if thetool then
+--                if letsDoDebug then print("Force equipping sychte") end
+--
+--                DoAutoEquipItem(inst.components.playercontroller, thetool, doonsuccess )
+--                buffered.invobject = thetool
+--                return buffered
+--            end
+--        else
+--            if letsDoDebug then print("Already has sychte equipped") end
+--        end
+--
+--    elseif( buffered.target.prefab and table.contains(aa_saplingTypes,buffered.target.prefab) and buffered.action == ACTIONS.DIG and not ignore and modOptions.IGNORE_SAPS ) then
+--        return false
+--    end
+--    return buffered
+--end
 
 local lastActionDone
 
-local doTimeDelay = 0
-local doNext = 0
-local forceNextAction = false
+--local doTimeDelay = 0
+--local doNext = 0
+--local forceNextAction = false
 -- attached to playercontroller.GetActionButtonAction
-local function GetActionButtonAction(playercontroller, forced, bufferedaction)
-    if not playercontroller or not playercontroller:IsEnabled() then return end
-    --print("start action 2")
+--local function GetActionButtonAction(playercontroller, forced, bufferedaction)
+--    if not playercontroller or not playercontroller:IsEnabled() then return end
+--    --print("start action 2")
+--
+--    if( doTimeDelay and doTimeDelay > GetTime() ) then
+--        return
+--    elseif( doTimeDelay and doTimeDelay <= GetTime() ) then
+--        doTimeDelay = nil
+--    end
+--
+--    if( playercontroller:IsDoingOrWorking() ) then if letsDoDebug then print("[Is working!]") end return end
+--
+--    if( forceUnequipTool and lastActionDone and forceUnequipTool == lastActionDone ) then
+--        DoUnequip(playercontroller)
+--        forceUnequipTool = nil
+--    end
+--
+--    if letsDoDebug then print("\n------------------------------------------------------") end
+--
+--    lastActionDone = bufferedaction and bufferedaction.action or nil
+--
+--    if( forcePlantSapling and modOptions.REPLANT_TREES ) then
+--        if letsDoDebug then print("Doing plant") end
+--        if( forcePlantSapling[1] and forcePlantSapling[2] and ( not forcePlantSapling[3] or forcePlantSapling[3] and not forcePlantSapling[3]:IsValid() ) and aa_seedTypes and aa_seedTypes[forcePlantSapling[1]] and GetInventory(playercontroller.inst) and CustomFindItem(playercontroller.inst, GetInventory(playercontroller.inst), function(itm) return itm.prefab and itm.prefab == aa_seedTypes[forcePlantSapling[1]] end) ~= nil ) then
+--            UpdateTreePlacer(forcePlantSapling)
+--
+--            local seedType = aa_seedTypes[forcePlantSapling[1]]
+--            local seed = CustomFindItem(playercontroller.inst, GetInventory(playercontroller.inst), function(itm) return itm.prefab and itm.prefab == seedType end)
+--            if( GLOBAL.TheWorld.Map:CanDeployPlantAtPoint(forcePlantSapling[2], seed) ) then
+--                if letsDoDebug then print("Planting plant") end
+--                local pos = forcePlantSapling[2]
+--                if( IMS(playercontroller) ) then
+--                    local act = BufferedAction( playercontroller.inst, nil, ACTIONS.DEPLOY, seed, pos, nil )
+--                    playercontroller.inst.components.locomotor:PushAction(act,true)
+--                else
+--                    local act = BufferedAction( playercontroller.inst, nil, ACTIONS.DEPLOY, seed, pos, nil )
+--                    act.preview_cb = function()
+--                        --SendRPCToServer(RPC.RightClick, act.action.code, pos.x, pos.z, act.target, false, controlmods, nil, act.action.mod_name)
+--                        SendRPCToServer(RPC.ControllerActionButtonDeploy, seed, pos.x, pos.z)
+--                    end
+--                    playercontroller:DoAction(act)
+--                end
+--
+--                forcePlantSapling = nil
+--                UpdateTreePlacer(nil,true)
+--                doTimeDelay = GetTime() + 0.75
+--                return
+--            else
+--                if letsDoDebug then print("Searching for pickup for plant") end
+--                local pos = forcePlantSapling[2]
+--
+--                local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, {"_inventoryitem"})
+--                if ents and ents[1] ~= nil then
+--                    if letsDoDebug then print("Found, now running") end
+--                    return GenerateNewBufferedAction(playercontroller, ents[1])
+--                end
+--            end
+--        elseif( not forcePlantSapling[1] or not forcePlantSapling[2] ) then
+--            forcePlantSapling = nil
+--            UpdateTreePlacer(nil,true)
+--        end
+--    elseif( forceResetTrap and modOptions.REACTIVATE_TRAPS ) then
+--        -- trapsprung
+--        if letsDoDebug then print("Doing re-trap") end
+--        if( forceResetTrap[1] and forceResetTrap[2] and GetInventory(playercontroller.inst) and CustomFindItem(playercontroller.inst, GetInventory(playercontroller.inst), function(itm) return itm.prefab and itm.prefab == forceResetTrap[1] end) ~= nil ) then
+--            local seed = CustomFindItem(playercontroller.inst, GetInventory(playercontroller.inst), function(itm) return itm.prefab and itm.prefab == forceResetTrap[1] end)
+--            if( seed ) then
+--                if letsDoDebug then print("Resetting trap") end
+--                local pos = forceResetTrap[2]
+--                if( IMS(playercontroller) ) then
+--                    local act = BufferedAction( playercontroller.inst, nil, ACTIONS.DROP, seed, pos, nil )
+--                    playercontroller.inst.components.locomotor:PushAction(act,true)
+--                else
+--                    local act = BufferedAction( playercontroller.inst, nil, ACTIONS.DROP, seed, pos, nil )
+--                    act.preview_cb = function()
+--                        SendRPCToServer(RPC.DropItemFromInvTile, seed, true)
+--                    end
+--                    playercontroller:DoAction(act)
+--                end
+--
+--                forceResetTrap = nil
+--                doTimeDelay = GetTime() + 0.75
+--                return
+--            end
+--        elseif( not forceResetTrap[1] or not forceResetTrap[2] ) then
+--            forceResetTrap = nil
+--        end
+--    end
+--
+--    if( bufferedaction and bufferedaction.action and bufferedaction.action.id and bufferedaction.action == ACTIONS.CATCH ) then
+--        if letsDoDebug then print("No matter what, always catch before anything else!") end
+--        return bufferedaction
+--    end
+--
+--    --print("start action 3")
+--    if letsDoDebug then print("Starting to find action!") end
+--    if letsDoDebug then print("Starting with tool/weapon:",playercontroller.inst.replica and playercontroller.inst.replica.inventory and playercontroller.inst.replica.inventory.GetEquippedItem and playercontroller.inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) or "None") end
+--
+--    local shouldIgnoreRestrictions = modOptions.IGNORE_RESTRICTIONS and playercontroller:IsControlPressed(41)
+--
+--    if letsDoDebug then print("Pre-Buffered info:",bufferedaction or "N/A") end
+--
+--
+--    if bufferedaction ~= nil then bufferedaction = DoCustomModifications(bufferedaction,playercontroller,shouldIgnoreRestrictions) end
+--    if type(bufferedaction) == "string" and bufferedaction == "end" then return end
+--
+--    if letsDoDebug then print("Post-Buffered info:",bufferedaction or "N/A") end
+--
+--    if letsDoDebug then print("[Trying to find a new action]") end
+--
+--    local tool
+--    local target
+--
+--
+--    local shouldMakeToolLater
+--    local shouldGetToolLater
+--
+--    if letsDoDebug then print("Doing economic mode") end
+--
+--    local foundSomething
+--    local canUseActions = {}
+--    local toolsOfActions = {}
+--    local actionOfChoice
+--
+--    for k, v in pairs(actsToUse) do
+--        if v and v.id then
+--            local letool
+--
+--            if( v == ACTIONS.CHOP ) then
+--                letool = FindTool(playercontroller.inst,GetInventory(playercontroller.inst), ACTIONS.CHOP, function(itm) return ( itm.prefab and itm.prefab == "lucy" ) end,modOptions.SWITCH_TOOLS_AUTO)
+--            end
+--
+--            if not letool then letool = FindTool(playercontroller.inst,GetInventory(playercontroller.inst), v, nil, modOptions.SWITCH_TOOLS_AUTO) end
+--
+--            if modOptions.SWITCH_TOOLS_AUTO and letool then
+--                table.insert(canUseActions, (v.id).."_workable")
+--                toolsOfActions[(v.id).."_workable"] = letool
+--                foundSomething = true
+--            elseif modOptions.SWITCH_TOOLS_AUTO and modOptions.TRY_PICKUP_NEARBY_TOOLS and GLOBAL.FindEntity(playercontroller.inst, 8, function( entitiy ) return true end, {"weapon",(v.id).."_tool"}, TARGET_EXCLUDE_TAGS) then
+--                table.insert(canUseActions, (v.id).."_workable")
+--                local canCraft, makeCraft = CanAndWhichToolToMake(playercontroller.inst,v.id,nil,true)
+--                toolsOfActions[(v.id).."_workable"] = "pickup"
+--                foundSomething = true
+--                if letsDoDebug then print("Can pick-up tool") end
+--            elseif modOptions.SWITCH_TOOLS_AUTO and modOptions.CRAFT_TOOLS_AUTO and CanAndWhichToolToMake(playercontroller.inst,v.id) then
+--                table.insert(canUseActions, (v.id).."_workable")
+--                local canCraft, makeCraft = CanAndWhichToolToMake(playercontroller.inst,v.id,nil,true)
+--                toolsOfActions[(v.id).."_workable"] = "craft"
+--                foundSomething = true
+--                if letsDoDebug then print("Can make a tool") end
+--            end
+--        end
+--    end
+--
+--    if foundSomething then
+--
+--        if letsDoDebug then
+--            print("Search gave:")
+--            for k,v in pairs(canUseActions) do
+--                print("-",v)
+--            end
+--        end
+--
+--        target = FindWorkableEntity(playercontroller.inst, nil, playercontroller.directwalking and 3 or 6, shouldIgnoreRestrictions, canUseActions)
+--        if target and target ~= nil then
+--            for k, v in pairs(actsToUse) do
+--                local leid = v.id
+--                if( target and target:HasTag(leid.."_workable") and toolsOfActions[leid.."_workable"] ~= nil ) then
+--                    if modOptions.TRY_PICKUP_NEARBY_TOOLS and type(toolsOfActions[leid.."_workable"]) == "string" and toolsOfActions[leid.."_workable"] == "pickup" then
+--                        shouldGetToolLater = leid
+--                    elseif modOptions.CRAFT_TOOLS_AUTO and type(toolsOfActions[leid.."_workable"]) == "string" and toolsOfActions[leid.."_workable"] == "craft" then
+--                        shouldMakeToolLater = leid
+--                    elseif modOptions.SWITCH_TOOLS_AUTO and toolsOfActions[leid.."_workable"] and type(toolsOfActions[leid.."_workable"]) ~= "string" then
+--                        tool = toolsOfActions[leid.."_workable"]
+--                        actionOfChoice = v
+--                    end
+--                end
+--            end
+--
+--            if target and tool and actionOfChoice then
+--                playercontroller.inst.autoequip_actiontodo = actionOfChoice
+--            end
+--        end
+--
+--    else
+--
+--        if letsDoDebug then print("Found nothing...") end
+--
+--    end
+--
+--    if letsDoDebug then print("Economic mode ending") end
+--
+--    if letsDoDebug then print("Result:",target or "n/a",tool or "n/a", target and bufferedaction and bufferedaction.target and bufferedaction.target == target or "n/a" ) end
+--
+--    if( target and shouldMakeToolLater ) then
+--        if( bufferedaction and bufferedaction.target ) then
+--            if playercontroller.inst:GetDistanceSqToInst(bufferedaction.target) > playercontroller.inst:GetDistanceSqToInst(target) then
+--                local canCraft, doCraft = CanAndWhichToolToMake(playercontroller.inst,shouldMakeToolLater,nil,true)
+--                if canCraft and doCraft then
+--                    playercontroller.inst.replica.builder:MakeRecipeFromMenu(AllRecipes[doCraft])
+--                end
+--                return
+--            end
+--        else
+--            local canCraft, doCraft = CanAndWhichToolToMake(playercontroller.inst,shouldMakeToolLater,nil,true)
+--            if canCraft and doCraft then
+--                playercontroller.inst.replica.builder:MakeRecipeFromMenu(AllRecipes[doCraft])
+--            end
+--            return
+--        end
+--    elseif( target and shouldGetToolLater ) then
+--        local closestTool = GLOBAL.FindEntity(playercontroller.inst, 8, function( entitiy ) return true end, {"weapon",shouldGetToolLater.."_tool"}, TARGET_EXCLUDE_TAGS)
+--        if closestTool then
+--            local pos = closestTool:GetPosition()
+--            if( bufferedaction and bufferedaction.target ) then
+--                if playercontroller.inst:GetDistanceSqToInst(bufferedaction.target) > playercontroller.inst:GetDistanceSqToInst(target) then
+--                    return GenerateNewBufferedAction(playercontroller, closestTool)
+--                end
+--            else
+--                return GenerateNewBufferedAction(playercontroller, closestTool)
+--            end
+--        end
+--    end
+--
+--    if tool and target and ( not bufferedaction or ( bufferedaction and bufferedaction.target ~= target ) ) then
+--
+--        if letsDoDebug then print("Possible new action: ",target,tool) end
+--
+--        if bufferedaction and bufferedaction.target and bufferedaction.action then
+--            if playercontroller.inst:GetDistanceSqToInst(bufferedaction.target) < playercontroller.inst:GetDistanceSqToInst(target) then
+--                if letsDoDebug then print("Doing action 1") end
+--                playercontroller.inst.autoequip_prioNextTarget = bufferedaction.target
+--                playercontroller.inst.autoequip_prioNextAct = bufferedaction.action
+--                doTimeDelay = GetTime()+0.25
+--                return bufferedaction
+--            else
+--                if letsDoDebug then print("Another action",tostring(tool), tostring(target), "is closer") end
+--            end
+--        else
+--            if letsDoDebug then print("Doing new action", tostring(tool), tostring(target)) end
+--        end
+--
+--        if not playercontroller.autoequip_lastequipped then
+--            playercontroller.autoequip_lastequipped = GetInventory(playercontroller.inst):GetEquippedItem(EQUIPSLOTS.HANDS)
+--            if not playercontroller.autoequip_lastequipped then playercontroller.autoequip_lastequipped = "empty" end
+--        end
+--
+--        --playercontroller.inst.components.locomotor:PushAction(BufferedAction(playercontroller.inst, target, playercontroller.inst.autoequip_actiontodo, tool), true)
+--
+--        local newAction = BufferedAction(playercontroller.inst, target, ACTIONS.WALKTO)
+--
+--        if( playercontroller.inst.autoequip_actiontodo and GetInventory(playercontroller.inst):GetEquippedItem(EQUIPSLOTS.HANDS) and type(GetInventory(playercontroller.inst):GetEquippedItem(EQUIPSLOTS.HANDS)) == "table" and GetInventory(playercontroller.inst):GetEquippedItem(EQUIPSLOTS.HANDS):HasTag((playercontroller.inst.autoequip_actiontodo.id).."_tool") ) then
+--            if letsDoDebug then print("Well... you already have the needed tool, so get started.") end
+--            playercontroller.inst.autoequip_prioNextTarget = target
+--            playercontroller.inst.autoequip_prioNextAct = playercontroller.inst.autoequip_actiontodo
+--            doNext = 4
+--        else
+--            --playercontroller.inst.components.locomotor:PushAction(BufferedAction(playercontroller.inst, nil, ACTIONS.EQUIP, tool), true)
+--            DoEquip(playercontroller.inst,tool) --todo : Check for dropping tool
+--            playercontroller.inst.autoequip_prioNextTarget = target
+--            playercontroller.inst.autoequip_prioNextAct = playercontroller.inst.autoequip_actiontodo
+--            if( playercontroller.inst.autoequip_prioNextAct.id == "DIG" or playercontroller.inst.autoequip_prioNextAct.id == "dig" ) then
+--                forceUnequipTool = playercontroller.inst.autoequip_prioNextAct
+--                if target and target.GetPosition and target.prefab and aa_seedTypes and aa_seedTypes[target.prefab] and modOptions.REPLANT_TREES then
+--                    local thepos = target:GetPosition()
+--                    if thepos then
+--                        forcePlantSapling = {
+--                            target.prefab,
+--                            thepos,
+--                            target
+--                        }
+--                        if letsDoDebug then print("SEED-TYPE:", target.prefab) end
+--                        forceNextAction = {"unequip"}
+--                        --forceNextAction = {"tree_root"}
+--                    else
+--                        forceNextAction = {"unequip"}
+--                    end
+--                else
+--                    forceNextAction = {"tree"}
+--                end
+--            end
+--            if letsDoDebug then print("Equipped tool, now we just have to use it next.", ACTIONS.EQUIP, tool) end
+--            doTimeDelay = GetTime()+0.25
+--        end
+--
+--        return newAction
+--
+--    else
+--
+--        --if bufferedaction then if letsDoDebug then print("Doing another action") end doTimeDelay = GetTime()+1 return bufferedaction end
+--        if bufferedaction then
+--            if letsDoDebug then print("Doing another action") end
+--            if bufferedaction and bufferedaction.target and bufferedaction.action then
+--                if modOptions.REPLANT_TREES and bufferedaction.action == ACTIONS.DIG and bufferedaction.target.GetPosition and bufferedaction.target.prefab and aa_seedTypes and aa_seedTypes[bufferedaction.target.prefab] then
+--                    local thepos = bufferedaction.target:GetPosition()
+--                    if thepos then
+--                        forcePlantSapling = {
+--                            bufferedaction.target.prefab,
+--                            thepos,
+--                            target
+--                        }
+--                        UpdateTreePlacer(forcePlantSapling)
+--
+--                        if letsDoDebug then print("SEED-TYPE:", bufferedaction.target.prefab) end
+--                    end
+--                elseif bufferedaction.action == ACTIONS.CHECKTRAP and bufferedaction.target.GetPosition and bufferedaction.target.prefab and modOptions.REACTIVATE_TRAPS then
+--                    local thepos = bufferedaction.target:GetPosition()
+--                    if thepos then
+--                        forceResetTrap = {
+--                            bufferedaction.target.prefab,
+--                            thepos
+--                        }
+--                        doTimeDelay = GetTime() + 0.75
+--                    end
+--                end
+--            end
+--
+--            return bufferedaction
+--        end
+--    end
+--end
 
-    if( doTimeDelay and doTimeDelay > GetTime() ) then
-        return
-    elseif( doTimeDelay and doTimeDelay <= GetTime() ) then
-        doTimeDelay = nil
-    end
-
-    if( playercontroller:IsDoingOrWorking() ) then if letsDoDebug then print("[Is working!]") end return end
-
-    if( forceUnequipTool and lastActionDone and forceUnequipTool == lastActionDone ) then
-        DoUnequip(playercontroller)
-        forceUnequipTool = nil
-    end
-
-    if letsDoDebug then print("\n------------------------------------------------------") end
-
-    lastActionDone = bufferedaction and bufferedaction.action or nil
-
-    if( forcePlantSapling and modOptions.REPLANT_TREES ) then
-        if letsDoDebug then print("Doing plant") end
-        if( forcePlantSapling[1] and forcePlantSapling[2] and ( not forcePlantSapling[3] or forcePlantSapling[3] and not forcePlantSapling[3]:IsValid() ) and aa_seedTypes and aa_seedTypes[forcePlantSapling[1]] and GetInventory(playercontroller.inst) and CustomFindItem(playercontroller.inst, GetInventory(playercontroller.inst), function(itm) return itm.prefab and itm.prefab == aa_seedTypes[forcePlantSapling[1]] end) ~= nil ) then
-            UpdateTreePlacer(forcePlantSapling)
-
-            local seedType = aa_seedTypes[forcePlantSapling[1]]
-            local seed = CustomFindItem(playercontroller.inst, GetInventory(playercontroller.inst), function(itm) return itm.prefab and itm.prefab == seedType end)
-            if( GLOBAL.TheWorld.Map:CanDeployPlantAtPoint(forcePlantSapling[2], seed) ) then
-                if letsDoDebug then print("Planting plant") end
-                local pos = forcePlantSapling[2]
-                if( IMS(playercontroller) ) then
-                    local act = BufferedAction( playercontroller.inst, nil, ACTIONS.DEPLOY, seed, pos, nil )
-                    playercontroller.inst.components.locomotor:PushAction(act,true)
-                else
-                    local act = BufferedAction( playercontroller.inst, nil, ACTIONS.DEPLOY, seed, pos, nil )
-                    act.preview_cb = function()
-                        --SendRPCToServer(RPC.RightClick, act.action.code, pos.x, pos.z, act.target, false, controlmods, nil, act.action.mod_name)
-                        SendRPCToServer(RPC.ControllerActionButtonDeploy, seed, pos.x, pos.z)
-                    end
-                    playercontroller:DoAction(act)
-                end
-
-                forcePlantSapling = nil
-                UpdateTreePlacer(nil,true)
-                doTimeDelay = GetTime() + 0.75
-                return
-            else
-                if letsDoDebug then print("Searching for pickup for plant") end
-                local pos = forcePlantSapling[2]
-
-                local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, {"_inventoryitem"})
-                if ents and ents[1] ~= nil then
-                    if letsDoDebug then print("Found, now running") end
-                    return GenerateNewBufferedAction(playercontroller, ents[1])
-                end
-            end
-        elseif( not forcePlantSapling[1] or not forcePlantSapling[2] ) then
-            forcePlantSapling = nil
-            UpdateTreePlacer(nil,true)
-        end
-    elseif( forceResetTrap and modOptions.REACTIVATE_TRAPS ) then
-        -- trapsprung
-        if letsDoDebug then print("Doing re-trap") end
-        if( forceResetTrap[1] and forceResetTrap[2] and GetInventory(playercontroller.inst) and CustomFindItem(playercontroller.inst, GetInventory(playercontroller.inst), function(itm) return itm.prefab and itm.prefab == forceResetTrap[1] end) ~= nil ) then
-            local seed = CustomFindItem(playercontroller.inst, GetInventory(playercontroller.inst), function(itm) return itm.prefab and itm.prefab == forceResetTrap[1] end)
-            if( seed ) then
-                if letsDoDebug then print("Resetting trap") end
-                local pos = forceResetTrap[2]
-                if( IMS(playercontroller) ) then
-                    local act = BufferedAction( playercontroller.inst, nil, ACTIONS.DROP, seed, pos, nil )
-                    playercontroller.inst.components.locomotor:PushAction(act,true)
-                else
-                    local act = BufferedAction( playercontroller.inst, nil, ACTIONS.DROP, seed, pos, nil )
-                    act.preview_cb = function()
-                        SendRPCToServer(RPC.DropItemFromInvTile, seed, true)
-                    end
-                    playercontroller:DoAction(act)
-                end
-
-                forceResetTrap = nil
-                doTimeDelay = GetTime() + 0.75
-                return
-            end
-        elseif( not forceResetTrap[1] or not forceResetTrap[2] ) then
-            forceResetTrap = nil
-        end
-    end
-
-    if( bufferedaction and bufferedaction.action and bufferedaction.action.id and bufferedaction.action == ACTIONS.CATCH ) then
-        if letsDoDebug then print("No matter what, always catch before anything else!") end
-        return bufferedaction
-    end
-
-    --print("start action 3")
-    if letsDoDebug then print("Starting to find action!") end
-    if letsDoDebug then print("Starting with tool/weapon:",playercontroller.inst.replica and playercontroller.inst.replica.inventory and playercontroller.inst.replica.inventory.GetEquippedItem and playercontroller.inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) or "None") end
-
-    local shouldIgnoreRestrictions = modOptions.IGNORE_RESTRICTIONS and playercontroller:IsControlPressed(41)
-
-    if letsDoDebug then print("Pre-Buffered info:",bufferedaction or "N/A") end
-
-
-    if bufferedaction ~= nil then bufferedaction = DoCustomModifications(bufferedaction,playercontroller,shouldIgnoreRestrictions) end
-    if type(bufferedaction) == "string" and bufferedaction == "end" then return end
-
-    if letsDoDebug then print("Post-Buffered info:",bufferedaction or "N/A") end
-
-    if letsDoDebug then print("[Trying to find a new action]") end
-
-    local tool
-    local target
-
-
-    local shouldMakeToolLater
-    local shouldGetToolLater
-
-    if letsDoDebug then print("Doing economic mode") end
-
-    local foundSomething
-    local canUseActions = {}
-    local toolsOfActions = {}
-    local actionOfChoice
-
-    for k, v in pairs(actsToUse) do
-        if v and v.id then
-            local letool
-
-            if( v == ACTIONS.CHOP ) then
-                letool = FindTool(playercontroller.inst,GetInventory(playercontroller.inst), ACTIONS.CHOP, function(itm) return ( itm.prefab and itm.prefab == "lucy" ) end,modOptions.SWITCH_TOOLS_AUTO)
-            end
-
-            if not letool then letool = FindTool(playercontroller.inst,GetInventory(playercontroller.inst), v, nil, modOptions.SWITCH_TOOLS_AUTO) end
-
-            if modOptions.SWITCH_TOOLS_AUTO and letool then
-                table.insert(canUseActions, (v.id).."_workable")
-                toolsOfActions[(v.id).."_workable"] = letool
-                foundSomething = true
-            elseif modOptions.SWITCH_TOOLS_AUTO and modOptions.TRY_PICKUP_NEARBY_TOOLS and GLOBAL.FindEntity(playercontroller.inst, 8, function( entitiy ) return true end, {"weapon",(v.id).."_tool"}, TARGET_EXCLUDE_TAGS) then
-                table.insert(canUseActions, (v.id).."_workable")
-                local canCraft, makeCraft = CanAndWhichToolToMake(playercontroller.inst,v.id,nil,true)
-                toolsOfActions[(v.id).."_workable"] = "pickup"
-                foundSomething = true
-                if letsDoDebug then print("Can pick-up tool") end
-            elseif modOptions.SWITCH_TOOLS_AUTO and modOptions.CRAFT_TOOLS_AUTO and CanAndWhichToolToMake(playercontroller.inst,v.id) then
-                table.insert(canUseActions, (v.id).."_workable")
-                local canCraft, makeCraft = CanAndWhichToolToMake(playercontroller.inst,v.id,nil,true)
-                toolsOfActions[(v.id).."_workable"] = "craft"
-                foundSomething = true
-                if letsDoDebug then print("Can make a tool") end
-            end
-        end
-    end
-
-    if foundSomething then
-
-        if letsDoDebug then
-            print("Search gave:")
-            for k,v in pairs(canUseActions) do
-                print("-",v)
-            end
-        end
-
-        target = FindWorkableEntity(playercontroller.inst, nil, playercontroller.directwalking and 3 or 6, shouldIgnoreRestrictions, canUseActions)
-        if target and target ~= nil then
-            for k, v in pairs(actsToUse) do
-                local leid = v.id
-                if( target and target:HasTag(leid.."_workable") and toolsOfActions[leid.."_workable"] ~= nil ) then
-                    if modOptions.TRY_PICKUP_NEARBY_TOOLS and type(toolsOfActions[leid.."_workable"]) == "string" and toolsOfActions[leid.."_workable"] == "pickup" then
-                        shouldGetToolLater = leid
-                    elseif modOptions.CRAFT_TOOLS_AUTO and type(toolsOfActions[leid.."_workable"]) == "string" and toolsOfActions[leid.."_workable"] == "craft" then
-                        shouldMakeToolLater = leid
-                    elseif modOptions.SWITCH_TOOLS_AUTO and toolsOfActions[leid.."_workable"] and type(toolsOfActions[leid.."_workable"]) ~= "string" then
-                        tool = toolsOfActions[leid.."_workable"]
-                        actionOfChoice = v
-                    end
-                end
-            end
-
-            if target and tool and actionOfChoice then
-                playercontroller.inst.autoequip_actiontodo = actionOfChoice
-            end
-        end
-
-    else
-
-        if letsDoDebug then print("Found nothing...") end
-
-    end
-
-    if letsDoDebug then print("Economic mode ending") end
-
-    if letsDoDebug then print("Result:",target or "n/a",tool or "n/a", target and bufferedaction and bufferedaction.target and bufferedaction.target == target or "n/a" ) end
-
-    if( target and shouldMakeToolLater ) then
-        if( bufferedaction and bufferedaction.target ) then
-            if playercontroller.inst:GetDistanceSqToInst(bufferedaction.target) > playercontroller.inst:GetDistanceSqToInst(target) then
-                local canCraft, doCraft = CanAndWhichToolToMake(playercontroller.inst,shouldMakeToolLater,nil,true)
-                if canCraft and doCraft then
-                    playercontroller.inst.replica.builder:MakeRecipeFromMenu(AllRecipes[doCraft])
-                end
-                return
-            end
-        else
-            local canCraft, doCraft = CanAndWhichToolToMake(playercontroller.inst,shouldMakeToolLater,nil,true)
-            if canCraft and doCraft then
-                playercontroller.inst.replica.builder:MakeRecipeFromMenu(AllRecipes[doCraft])
-            end
-            return
-        end
-    elseif( target and shouldGetToolLater ) then
-        local closestTool = GLOBAL.FindEntity(playercontroller.inst, 8, function( entitiy ) return true end, {"weapon",shouldGetToolLater.."_tool"}, TARGET_EXCLUDE_TAGS)
-        if closestTool then
-            local pos = closestTool:GetPosition()
-            if( bufferedaction and bufferedaction.target ) then
-                if playercontroller.inst:GetDistanceSqToInst(bufferedaction.target) > playercontroller.inst:GetDistanceSqToInst(target) then
-                    return GenerateNewBufferedAction(playercontroller, closestTool)
-                end
-            else
-                return GenerateNewBufferedAction(playercontroller, closestTool)
-            end
-        end
-    end
-
-    if tool and target and ( not bufferedaction or ( bufferedaction and bufferedaction.target ~= target ) ) then
-
-        if letsDoDebug then print("Possible new action: ",target,tool) end
-
-        if bufferedaction and bufferedaction.target and bufferedaction.action then
-            if playercontroller.inst:GetDistanceSqToInst(bufferedaction.target) < playercontroller.inst:GetDistanceSqToInst(target) then
-                if letsDoDebug then print("Doing action 1") end
-                playercontroller.inst.autoequip_prioNextTarget = bufferedaction.target
-                playercontroller.inst.autoequip_prioNextAct = bufferedaction.action
-                doTimeDelay = GetTime()+0.25
-                return bufferedaction
-            else
-                if letsDoDebug then print("Another action",tostring(tool), tostring(target), "is closer") end
-            end
-        else
-            if letsDoDebug then print("Doing new action", tostring(tool), tostring(target)) end
-        end
-
-        if not playercontroller.autoequip_lastequipped then
-            playercontroller.autoequip_lastequipped = GetInventory(playercontroller.inst):GetEquippedItem(EQUIPSLOTS.HANDS)
-            if not playercontroller.autoequip_lastequipped then playercontroller.autoequip_lastequipped = "empty" end
-        end
-
-        --playercontroller.inst.components.locomotor:PushAction(BufferedAction(playercontroller.inst, target, playercontroller.inst.autoequip_actiontodo, tool), true)
-
-        local newAction = BufferedAction(playercontroller.inst, target, ACTIONS.WALKTO)
-
-        if( playercontroller.inst.autoequip_actiontodo and GetInventory(playercontroller.inst):GetEquippedItem(EQUIPSLOTS.HANDS) and type(GetInventory(playercontroller.inst):GetEquippedItem(EQUIPSLOTS.HANDS)) == "table" and GetInventory(playercontroller.inst):GetEquippedItem(EQUIPSLOTS.HANDS):HasTag((playercontroller.inst.autoequip_actiontodo.id).."_tool") ) then
-            if letsDoDebug then print("Well... you already have the needed tool, so get started.") end
-            playercontroller.inst.autoequip_prioNextTarget = target
-            playercontroller.inst.autoequip_prioNextAct = playercontroller.inst.autoequip_actiontodo
-            doNext = 4
-        else
-            --playercontroller.inst.components.locomotor:PushAction(BufferedAction(playercontroller.inst, nil, ACTIONS.EQUIP, tool), true)
-            DoEquip(playercontroller.inst,tool) --todo : Check for dropping tool
-            playercontroller.inst.autoequip_prioNextTarget = target
-            playercontroller.inst.autoequip_prioNextAct = playercontroller.inst.autoequip_actiontodo
-            if( playercontroller.inst.autoequip_prioNextAct.id == "DIG" or playercontroller.inst.autoequip_prioNextAct.id == "dig" ) then
-                forceUnequipTool = playercontroller.inst.autoequip_prioNextAct
-                if target and target.GetPosition and target.prefab and aa_seedTypes and aa_seedTypes[target.prefab] and modOptions.REPLANT_TREES then
-                    local thepos = target:GetPosition()
-                    if thepos then
-                        forcePlantSapling = {
-                            target.prefab,
-                            thepos,
-                            target
-                        }
-                        if letsDoDebug then print("SEED-TYPE:", target.prefab) end
-                        forceNextAction = {"unequip"}
-                        --forceNextAction = {"tree_root"}
-                    else
-                        forceNextAction = {"unequip"}
-                    end
-                else
-                    forceNextAction = {"tree"}
-                end
-            end
-            if letsDoDebug then print("Equipped tool, now we just have to use it next.", ACTIONS.EQUIP, tool) end
-            doTimeDelay = GetTime()+0.25
-        end
-
-        return newAction
-
-    else
-
-        --if bufferedaction then if letsDoDebug then print("Doing another action") end doTimeDelay = GetTime()+1 return bufferedaction end
-        if bufferedaction then
-            if letsDoDebug then print("Doing another action") end
-            if bufferedaction and bufferedaction.target and bufferedaction.action then
-                if modOptions.REPLANT_TREES and bufferedaction.action == ACTIONS.DIG and bufferedaction.target.GetPosition and bufferedaction.target.prefab and aa_seedTypes and aa_seedTypes[bufferedaction.target.prefab] then
-                    local thepos = bufferedaction.target:GetPosition()
-                    if thepos then
-                        forcePlantSapling = {
-                            bufferedaction.target.prefab,
-                            thepos,
-                            target
-                        }
-                        UpdateTreePlacer(forcePlantSapling)
-
-                        if letsDoDebug then print("SEED-TYPE:", bufferedaction.target.prefab) end
-                    end
-                elseif bufferedaction.action == ACTIONS.CHECKTRAP and bufferedaction.target.GetPosition and bufferedaction.target.prefab and modOptions.REACTIVATE_TRAPS then
-                    local thepos = bufferedaction.target:GetPosition()
-                    if thepos then
-                        forceResetTrap = {
-                            bufferedaction.target.prefab,
-                            thepos
-                        }
-                        doTimeDelay = GetTime() + 0.75
-                    end
-                end
-            end
-
-            return bufferedaction
-        end
-    end
-end
-
+ -- 有被调用
 local function DoAction(playercontroller, bufferedaction)
     if not bufferedaction then return end
     if not bufferedaction.action then return end
@@ -1115,17 +1125,19 @@ local function DoAction(playercontroller, bufferedaction)
 end
 
 -- attached to playercontroller.DoAttackButton
-local function DoAttackButton(playercontroller)
-    local isForced = TheInput:IsControlPressed(GLOBAL.CONTROL_FORCE_ATTACK)
-    local target = playercontroller:GetAttackTarget(isForced)
-    if target and playercontroller.inst.replica.combat.target ~= target and modOptions.EQUIP_WEAPONS then
-        local bufferedaction = BufferedAction(playercontroller.inst, target, ACTIONS.ATTACK)
-        AutoEquipBestWeapon(playercontroller, target, isForced, bufferedaction)
-        -- playercontroller.inst.components.locomotor:PushAction(bufferedaction, true)
-    end
-end
+-- 执行攻击
+--local function DoAttackButton(playercontroller)
+--    local isForced = TheInput:IsControlPressed(GLOBAL.CONTROL_FORCE_ATTACK)
+--    local target = playercontroller:GetAttackTarget(isForced)
+--    if target and playercontroller.inst.replica.combat.target ~= target and modOptions.EQUIP_WEAPONS then
+--        local bufferedaction = BufferedAction(playercontroller.inst, target, ACTIONS.ATTACK)
+--        AutoEquipBestWeapon(playercontroller, target, isForced, bufferedaction)
+--        -- playercontroller.inst.components.locomotor:PushAction(bufferedaction, true)
+--    end
+--end
 
 -- attached to playercontroller.GetClickActions
+--点击操作
 local function GetClickActions(playeractionpicker,position, target, actions, spellbook)
     if not target then return actions end
     if not actions then return actions end
@@ -1160,6 +1172,7 @@ local function GetClickActions(playeractionpicker,position, target, actions, spe
     return actions
 end
 
+-- 右键修复墙体
 local function CanRepairWall( inst, target )
     if( not inst or not target or not GetInventory(inst) ) then return false end
     if( target and target.replica and target.replica._ and target.replica._.health and target.replica._.health._isnotfull and target.replica._.health._isnotfull.value and target.replica._.health._isnotfull:value() ~= true ) then return false end
@@ -1174,6 +1187,7 @@ local function CanRepairWall( inst, target )
     return wallitem
 end
 
+-- 火堆添加燃烧物
 local function CanFeedFire( inst, target )
     if( not inst or not target or not GetInventory(inst) or not modOptions.REFUEL_FIRES ) then return false end
 
@@ -1210,6 +1224,7 @@ local function CanFeedFire( inst, target )
 end
 
 -- attached to playercontroller.GetRightClickActions
+-- 右键点击操作
 local function GetRightClickActions(playeractionpicker, position, target, actions, spellbook)
     if not target then return actions end
     if not actions then return actions end
@@ -1260,6 +1275,7 @@ end
 local originalFunctions = {}
 local originalFunctionsPicker = {}
 
+-- 左右键的问题
 local function addPlayeractionpicker( inst, inst2, inst3 )
 
     local controller = inst
@@ -1292,25 +1308,29 @@ local function addPlayeractionpicker( inst, inst2, inst3 )
 end
 AddClassPostConstruct("components/playeractionpicker", addPlayeractionpicker)
 
+-- 整条线完成了修改
 local shouldToggleEnabled = nil
 local function addPlayerController( inst )
     local controller = inst
 
-    originalFunctions.OnUpdate = controller.OnUpdate;
-    originalFunctions.GetActionButtonAction = controller.GetActionButtonAction;
-    originalFunctions.DoAction = controller.DoAction;
-    originalFunctions.DoAttackButton = controller.DoAttackButton;
+    -- 这里应该是四个不同的功能
+    originalFunctions.OnUpdate = controller.OnUpdate; -- 照明
+    --originalFunctions.GetActionButtonAction = controller.GetActionButtonAction; -- 自动切换工具
+    --originalFunctions.DoAction = controller.DoAction; -- 建造？
+    --originalFunctions.DoAttackButton = controller.DoAttackButton; -- 攻击
 
     -- Ooooooo
 
     controller.OnUpdate = function(salf, dt)
         originalFunctions.OnUpdate(salf,dt)
         if(shouldToggleEnabled ~= nil) then
+            -- 有疑问，需要修改----------------------------------------------------------------
             ToggleModEnabled(salf,shouldToggleEnabled);
             shouldToggleEnabled=nil;
             return;
         end
         if(modOptions.ENABLED) then
+            -- 在这里调用了
             local successflag, retvalue = pcall(OnUpdate, salf, dt)
             if not successflag then
                 if letsDoDebug then print(retvalue) end
@@ -1318,45 +1338,46 @@ local function addPlayerController( inst )
         end
     end
 
-    controller.GetActionButtonAction = function(salf,forced)
-        --print("Action button")
-        local bufferedaction = originalFunctions.GetActionButtonAction(salf,forced or salf.autoequip_prioNextTarget or nil)
-        local successflag, retvalue = pcall(GetActionButtonAction, salf, forced or salf.autoequip_prioNextTarget or nil, bufferedaction)
-        if not successflag then
-            if letsDoDebug then print("Ran default ABA with: ",bufferedaction) end
-            return bufferedaction
-        else
-            if letsDoDebug then print("Ran custom ABA with: ",retvalue) end
-            return retvalue
-        end
-    end
-
-    controller.DoAction = function(salf, bufferedaction)
-        --print("Action")
-        local successflag, retvalue = pcall(DoAction, salf, bufferedaction)
-        if( successflag and retvalue ) then
-            if letsDoDebug then print("Worked, sending:", retvalue) end
-            if( retvalue and type(retvalue) == "string" and retvalue == "empty" ) then
-                originalFunctions.DoAction(salf,nil)
-            else
-                originalFunctions.DoAction(salf,retvalue)
-            end
-        else
-            if letsDoDebug then print("Failed") end
-            originalFunctions.DoAction(salf,bufferedaction)
-        end
-    end
-
-    controller.DoAttackButton = function(salf)
-        local successflag, retvalue = pcall(DoAttackButton, salf)
-        if not successflag then
-            if letsDoDebug then print(retvalue) end
-        end
-        originalFunctions.DoAttackButton(salf)
-    end
+    --controller.GetActionButtonAction = function(salf,forced)
+    --    --print("Action button")
+    --    local bufferedaction = originalFunctions.GetActionButtonAction(salf,forced or salf.autoequip_prioNextTarget or nil)
+    --    local successflag, retvalue = pcall(GetActionButtonAction, salf, forced or salf.autoequip_prioNextTarget or nil, bufferedaction)
+    --    if not successflag then
+    --        if letsDoDebug then print("Ran default ABA with: ",bufferedaction) end
+    --        return bufferedaction
+    --    else
+    --        if letsDoDebug then print("Ran custom ABA with: ",retvalue) end
+    --        return retvalue
+    --    end
+    --end
+    --
+    --controller.DoAction = function(salf, bufferedaction)
+    --    --print("Action")
+    --    local successflag, retvalue = pcall(DoAction, salf, bufferedaction)
+    --    if( successflag and retvalue ) then
+    --        if letsDoDebug then print("Worked, sending:", retvalue) end
+    --        if( retvalue and type(retvalue) == "string" and retvalue == "empty" ) then
+    --            originalFunctions.DoAction(salf,nil)
+    --        else
+    --            originalFunctions.DoAction(salf,retvalue)
+    --        end
+    --    else
+    --        if letsDoDebug then print("Failed") end
+    --        originalFunctions.DoAction(salf,bufferedaction)
+    --    end
+    --end
+    --
+    --controller.DoAttackButton = function(salf)
+    --    local successflag, retvalue = pcall(DoAttackButton, salf)
+    --    if not successflag then
+    --        if letsDoDebug then print(retvalue) end
+    --    end
+    --    originalFunctions.DoAttackButton(salf)
+    --end
 end
 AddClassPostConstruct("components/playercontroller", addPlayerController)
 
+-- 有被调用，玩家动作的
 function ToggleModEnabled( controller, state )
 
     local playctrl = controller.inst.components.playercontroller
@@ -1438,7 +1459,7 @@ function ToggleModEnabled( controller, state )
 
 end
 
-
+-- 不确定，获取行动？
 local function GetPickupAction(target, tool)
     if target:HasTag("smolder") then
         return ACTIONS.SMOTHER
@@ -1479,8 +1500,9 @@ local function GetPickupAction(target, tool)
     --no action found
 end
 
-local CanEntitySeeTarget = GLOBAL.CanEntitySeeTarget
 
+-- 关于生火的
+local CanEntitySeeTarget = GLOBAL.CanEntitySeeTarget
 Backup_GetActionButtonAction = function(self, force_target, ignore_targets, musthave, donthave)
     --Don't want to spam the action button before the server actually starts the buffered action
     --Also check if playercontroller is enabled
@@ -1608,98 +1630,101 @@ Backup_GetActionButtonAction = function(self, force_target, ignore_targets, must
 end
 
 -- 按键控制主代码
-local handlers_applied = false
-local function AddAASettings( self )
-    controls = self -- this just makes controls available in the rest of the modmain's functions
-    inst = GLOBAL.ThePlayer
+--local handlers_applied = false
+--local function AddAASettings( self )
+--    controls = self -- this just makes controls available in the rest of the modmain's functions
+--    inst = GLOBAL.ThePlayer
+--
+--    if not handlers_applied then
+--        -- Keyboard controls
+--        -- 按键控制
+--        GLOBAL.TheInput:AddKeyDownHandler(KEYBOARDTOGGLEKEY, function()
+--            if TheInput and TheInput.IsControlPressed and TheInput:IsControlPressed(GLOBAL.CONTROL_FORCE_INSPECT) then
+--                if(modOptions.EQUIP_WEAPONS) then
+--                    local bestweapon = GetInventory(inst):GetEquippedItem(EQUIPSLOTS.HANDS)
+--                    if( bestweapon and ( not hasPreferedWeapon or hasPreferedWeapon ~= bestweapon.prefab ) ) then
+--                        hasPreferedWeapon = bestweapon.prefab
+--                        inst.components.talker:Say("I'll use this "..tostring(bestweapon.name or "N/A").." as my primary weapon.", 5, true, true, true)
+--                    elseif( bestweapon and hasPreferedWeapon and hasPreferedWeapon == bestweapon.prefab ) then
+--                        hasPreferedWeapon = nil
+--                        inst.components.talker:Say("I'll now use whatever strongest, standard weapon that I have.", 5, true, true, true)
+--                    end
+--                else
+--                    inst.components.talker:Say("Auto-equipping a weapon is disabled in the mod's settings.", 5, true, true, true)
+--                end
+--            else
+--                ShowSettingsMenu(controls)
+--            end
+--        end)
+--        handlers_applied = true
+--    end
+--
+--    AddUserCommand("aa", {
+--        prettyname = nil,
+--        desc = nil,
+--        permission = GLOBAL.COMMAND_PERMISSION.USER,
+--        slash = true,
+--        usermenu = false,
+--        servermenu = false,
+--        params = {},
+--        localfn = function()
+--            ShowSettingsMenu(controls);
+--        end
+--    })
+--
+--    AddUserCommand("autowep", {
+--        prettyname = nil,
+--        desc = nil,
+--        permission = GLOBAL.COMMAND_PERMISSION.USER,
+--        slash = true,
+--        usermenu = false,
+--        servermenu = false,
+--        params = {},
+--        localfn = function()
+--            local inst = GLOBAL.ThePlayer;
+--            if(modOptions.EQUIP_WEAPONS) then
+--                local bestweapon = GetInventory(inst):GetEquippedItem(EQUIPSLOTS.HANDS)
+--                if( bestweapon and ( not hasPreferedWeapon or hasPreferedWeapon ~= bestweapon.prefab ) ) then
+--                    hasPreferedWeapon = bestweapon.prefab
+--                    inst.components.talker:Say("I'll use this "..tostring(bestweapon.name or "N/A").." as my primary weapon.", 5, true, true, true)
+--                elseif( bestweapon and hasPreferedWeapon and hasPreferedWeapon == bestweapon.prefab ) then
+--                    hasPreferedWeapon = nil
+--                    inst.components.talker:Say("I'll now use whatever strongest, standard weapon that I have.", 5, true, true, true)
+--                end
+--            else
+--                inst.components.talker:Say("Auto-equipping a weapon is disabled in the mod's settings.", 5, true, true, true)
+--            end
+--        end
+--    })
+--
+--    -- 这个是关于照亮的
+--    -- 但是这个是关于聊天的
+--    AddUserCommand("unequip", {
+--        prettyname = nil,
+--        desc = nil,
+--        permission = GLOBAL.COMMAND_PERMISSION.USER,
+--        slash = true,
+--        usermenu = false,
+--        servermenu = false,
+--        params = {},
+--        localfn = function()
+--            CheckIfOutOfDarkness(GLOBAL.ThePlayer);
+--        end
+--    })
+--
+--    local OldOnUpdate = controls.OnUpdate
+--    local function OnUpdate(...)
+--        OldOnUpdate(...)
+--        if controls.updatesettings then
+--            controls.updatesettings = false
+--            UpdateSettings()
+--        end
+--    end
+--    controls.OnUpdate = OnUpdate
+--
+--end
 
-    if not handlers_applied then
-        -- Keyboard controls
-        -- 按键控制
-        GLOBAL.TheInput:AddKeyDownHandler(KEYBOARDTOGGLEKEY, function()
-            if TheInput and TheInput.IsControlPressed and TheInput:IsControlPressed(GLOBAL.CONTROL_FORCE_INSPECT) then
-                if(modOptions.EQUIP_WEAPONS) then
-                    local bestweapon = GetInventory(inst):GetEquippedItem(EQUIPSLOTS.HANDS)
-                    if( bestweapon and ( not hasPreferedWeapon or hasPreferedWeapon ~= bestweapon.prefab ) ) then
-                        hasPreferedWeapon = bestweapon.prefab
-                        inst.components.talker:Say("I'll use this "..tostring(bestweapon.name or "N/A").." as my primary weapon.", 5, true, true, true)
-                    elseif( bestweapon and hasPreferedWeapon and hasPreferedWeapon == bestweapon.prefab ) then
-                        hasPreferedWeapon = nil
-                        inst.components.talker:Say("I'll now use whatever strongest, standard weapon that I have.", 5, true, true, true)
-                    end
-                else
-                    inst.components.talker:Say("Auto-equipping a weapon is disabled in the mod's settings.", 5, true, true, true)
-                end
-            else
-                ShowSettingsMenu(controls)
-            end
-        end)
-        handlers_applied = true
-    end
-
-    AddUserCommand("aa", {
-        prettyname = nil,
-        desc = nil,
-        permission = GLOBAL.COMMAND_PERMISSION.USER,
-        slash = true,
-        usermenu = false,
-        servermenu = false,
-        params = {},
-        localfn = function()
-            ShowSettingsMenu(controls);
-        end
-    })
-
-    AddUserCommand("autowep", {
-        prettyname = nil,
-        desc = nil,
-        permission = GLOBAL.COMMAND_PERMISSION.USER,
-        slash = true,
-        usermenu = false,
-        servermenu = false,
-        params = {},
-        localfn = function()
-            local inst = GLOBAL.ThePlayer;
-            if(modOptions.EQUIP_WEAPONS) then
-                local bestweapon = GetInventory(inst):GetEquippedItem(EQUIPSLOTS.HANDS)
-                if( bestweapon and ( not hasPreferedWeapon or hasPreferedWeapon ~= bestweapon.prefab ) ) then
-                    hasPreferedWeapon = bestweapon.prefab
-                    inst.components.talker:Say("I'll use this "..tostring(bestweapon.name or "N/A").." as my primary weapon.", 5, true, true, true)
-                elseif( bestweapon and hasPreferedWeapon and hasPreferedWeapon == bestweapon.prefab ) then
-                    hasPreferedWeapon = nil
-                    inst.components.talker:Say("I'll now use whatever strongest, standard weapon that I have.", 5, true, true, true)
-                end
-            else
-                inst.components.talker:Say("Auto-equipping a weapon is disabled in the mod's settings.", 5, true, true, true)
-            end
-        end
-    })
-
-    AddUserCommand("unequip", {
-        prettyname = nil,
-        desc = nil,
-        permission = GLOBAL.COMMAND_PERMISSION.USER,
-        slash = true,
-        usermenu = false,
-        servermenu = false,
-        params = {},
-        localfn = function()
-            CheckIfOutOfDarkness(GLOBAL.ThePlayer);
-        end
-    })
-
-    local OldOnUpdate = controls.OnUpdate
-    local function OnUpdate(...)
-        OldOnUpdate(...)
-        if controls.updatesettings then
-            controls.updatesettings = false
-            UpdateSettings()
-        end
-    end
-    controls.OnUpdate = OnUpdate
-
-end
-
+-- 有用的部分
 local AA_DEBUG = {
     GUM = function()
         return TheInput:GetWorldEntityUnderMouse();
@@ -1708,4 +1733,4 @@ local AA_DEBUG = {
 }
 GLOBAL.AA_DEBUG = AA_DEBUG;
 
-AddClassPostConstruct( "widgets/controls", AddAASettings )
+--AddClassPostConstruct( "widgets/controls", AddAASettings )
