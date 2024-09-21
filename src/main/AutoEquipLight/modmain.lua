@@ -511,7 +511,7 @@ local function CheckIfInDarkness( inst )
         if letsDoDebug then print("That's it, I'm equipping light!") end
         firstCheckedForDarkness = nil
 
-        local possibleLights = CustomFindItem(inst, GetInventory(inst), function(item) return item:HasTag("lighter") end) -- For now, just use whatever can be found
+        local possibleLights = CustomFindItem(inst, GetInventory(inst), function(item) return item:HasTag("lighter") or item:HasTag("light") end) -- For now, just use whatever can be found
         if( possibleLights ) then
             if possibleLights then
                 if letsDoDebug then print("Equipping a light-source!") print(possibleLights) end
@@ -540,9 +540,11 @@ local function CheckIfOutOfDarkness( inst )
     if(tookLightOut == nil) then return end
 
     local tool = inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS);
-    if(tool ~= nil and tool:HasTag("lighter")) then
-        inst.replica.inventory:UseItemFromInvTile(inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS))
-        tookLightOut = nil;
+    if(tool ~= nil) then
+        if(tool:HasTag("lighter") or tool:HasTag("light")  ) then
+            inst.replica.inventory:UseItemFromInvTile(inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS))
+            tookLightOut = nil;
+        end
     end
 end
 
@@ -1324,7 +1326,7 @@ local function addPlayerController( inst )
     controller.OnUpdate = function(salf, dt)
         originalFunctions.OnUpdate(salf,dt)
         if(shouldToggleEnabled ~= nil) then
-            -- 有疑问，需要修改----------------------------------------------------------------
+            -- 记录上次用的是什么
             ToggleModEnabled(salf,shouldToggleEnabled);
             shouldToggleEnabled=nil;
             return;
