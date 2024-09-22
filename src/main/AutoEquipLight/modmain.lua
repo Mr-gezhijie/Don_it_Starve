@@ -127,7 +127,7 @@ local modOptions = {
     --IGNORE_SAPS = GetModConfigData("ae_alwaysignoresaps") > 0,
     --
     --TRY_PICKUP_NEARBY_TOOLS = GetModConfigData("ae_use_nearby_tools") > 0,
-    --SWITCH_TOOLS_AUTO = GetModConfigData("ae_switchtools") == 1 or GetModConfigData("ae_switchtools") == 2,
+    SWITCH_TOOLS_AUTO = GetModConfigData("ae_switchtools") == 1 or GetModConfigData("ae_switchtools") == 2,
     --SWITCH_TOOLS_MOUSE = GetModConfigData("ae_switchtools") == 1 or GetModConfigData("ae_switchtools") == 3,
     --EQUIP_WEAPONS = GetModConfigData("ae_equipweapon") > 0,
     --CRITTERS_WITH_BOOMERANG = GetModConfigData("ae_boomcritters") > 0,
@@ -195,13 +195,14 @@ local function ShowSettingsMenu( controls )
     GLOBAL.TheFrontEnd:PushScreen(AASC(controls))
 end
 
--- 用于装备工具或者武器的
+-- 用于装备工具或者武器的（配置inst物品）
 local function DoEquip( inst, tool )
     if( inst == nil or inst.components == nil or inst.components.playercontroller == nil or tool == nil ) then return end
 
     local plcotrl = inst.components.playercontroller
     if( plcotrl and plcotrl.inst and plcotrl.inst.replica and plcotrl.inst.replica.inventory ) then
         if letsDoDebug then print("- Equipping tool/weapon:",tool) end
+        -- 防止过快切换装备
         delayUnequipASecond = GetTime()+0.25
         hasEquipped = true;
 
@@ -287,18 +288,18 @@ end
 --    return zeItem
 --end
 
---local function FindTool(inst, inventory, action, checkbp, canswitch )
---    if( not canswitch ) then
---        return nil;
---    end
---    return ( inventory and ( inventory.GetItems or inventory.itemslots ) and CustomFindItem( inst, inventory, function(item)
---        return item:HasTag(action.id.."_tool") and ( not checkbp or ( checkbp and checkbp(item) ) )
---    end) ) or ( inventory and inventory.FindItem and inventory:FindItem(function(item)
---        return item:HasTag(action.id.."_tool") and ( not checkbp or ( checkbp and checkbp(item) ) )
---    end) ) or ( inventory and inventory.GetOverflowContainer and inventory:GetOverflowContainer() and ( inventory:GetOverflowContainer().GetItems or inventory:GetOverflowContainer().itemslots ) and CustomFindItem( inst, inventory:GetOverflowContainer(), function(item)
---        return item:HasTag(action.id.."_tool") and ( not checkbp or ( checkbp and checkbp(item) ) )
---    end) ) or nil
---end
+local function FindTool(inst, inventory, action, checkbp, canswitch )
+    if( not canswitch ) then
+        return nil;
+    end
+    return ( inventory and ( inventory.GetItems or inventory.itemslots ) and CustomFindItem( inst, inventory, function(item)
+        return item:HasTag(action.id.."_tool") and ( not checkbp or ( checkbp and checkbp(item) ) )
+    end) ) or ( inventory and inventory.FindItem and inventory:FindItem(function(item)
+        return item:HasTag(action.id.."_tool") and ( not checkbp or ( checkbp and checkbp(item) ) )
+    end) ) or ( inventory and inventory.GetOverflowContainer and inventory:GetOverflowContainer() and ( inventory:GetOverflowContainer().GetItems or inventory:GetOverflowContainer().itemslots ) and CustomFindItem( inst, inventory:GetOverflowContainer(), function(item)
+        return item:HasTag(action.id.."_tool") and ( not checkbp or ( checkbp and checkbp(item) ) )
+    end) ) or nil
+end
 
  -- 不敢动--------------------------------------------------------
 local function DoMatch( tab, value )
@@ -511,7 +512,22 @@ local function CheckIfInDarkness( inst )
         if letsDoDebug then print("That's it, I'm equipping light!") end
         firstCheckedForDarkness = nil
 
-        local possibleLights = CustomFindItem(inst, GetInventory(inst), function(item) return item:HasTag("lighter") or item:HasTag("light") end) -- For now, just use whatever can be found
+
+
+
+
+
+
+
+        -- 先查找是否有提灯
+        local possibleLights = CustomFindItem(inst, GetInventory(inst), function(item) return item:HasTag("light") and not item:HasTag("lightbattery") end) -- For now, just use whatever can be found
+        -- 判断是否有提灯，没有提灯或者燃料，就会查找火把
+        if letsDoDebug then print("打印耐久度" .. tostring(possibleLights.replica.inventoryitem.classified.percentused:value()) ) end
+        if( possibleLights == nil or possibleLights.replica.inventoryitem.classified.percentused:value() < 1 )then
+            possibleLights = CustomFindItem(inst, GetInventory(inst), function(item) return item:HasTag("lighter") end) -- For now, just use whatever can be found
+        end
+
+
         if( possibleLights ) then
             if possibleLights then
                 if letsDoDebug then print("Equipping a light-source!") print(possibleLights) end
@@ -583,13 +599,31 @@ local function UpdateTreePlacer( info, doremove )
     end
 end
 
+
+local function GetEquippedItem(inst)
+    if inst and inst.replica and inst.replica.inventory then
+        return inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
+    end
+    return nil
+end
+
 -- attached to playercontroller.OnUpdate
 -- 照明装备「处理动作」
 local function OnUpdate(playercontroller, dt)
     if not playercontroller:IsEnabled() then return end
-    -- 查看定义的boolean
+
+    -- 是发光衣服
+    local isShineOutfit =  false
+    -- 使用示例，获取玩家头上的装备物品
+    local equipped_hat = GetEquippedItem(playercontroller.inst)
+    if equipped_hat and tostring(equipped_hat.prefab) == "molehat" then
+        isShineOutfit = true
+    end
+
+
+    -- 查看定义的判断什么时候开灯
     if modOptions.EQUIP_LIGHT_IN_DARK then
-        if GLOBAL.TheWorld.state.isnight and not GLOBAL.TheWorld.state.isfullmoon and playercontroller.inst.LightWatcher and not playercontroller.inst.LightWatcher:IsInLight() then CheckIfInDarkness(playercontroller.inst) elseif(  not (GLOBAL.TheWorld.state.isnight and not GLOBAL.TheWorld.state.isfullmoon and playercontroller.inst.LightWatcher and not playercontroller.inst.LightWatcher:IsInLight()) and firstCheckedForDarkness ) then firstCheckedForDarkness = nil elseif(not GLOBAL.TheWorld.state.isnight and tookLightOut ~= nil) then CheckIfOutOfDarkness(playercontroller.inst) end
+        if  not isShineOutfit and GLOBAL.TheWorld.state.isnight and not GLOBAL.TheWorld.state.isfullmoon and playercontroller.inst.LightWatcher and not playercontroller.inst.LightWatcher:IsInLight() then CheckIfInDarkness(playercontroller.inst) elseif(  not (GLOBAL.TheWorld.state.isnight and not GLOBAL.TheWorld.state.isfullmoon and playercontroller.inst.LightWatcher and not playercontroller.inst.LightWatcher:IsInLight()) and firstCheckedForDarkness ) then firstCheckedForDarkness = nil elseif(not GLOBAL.TheWorld.state.isnight and tookLightOut ~= nil) then CheckIfOutOfDarkness(playercontroller.inst) end
     end
     if(HasShownPredictiveWarning == nil) then
         if(PlayerProfile:GetMovementPredictionEnabled() == false) then
@@ -1325,12 +1359,12 @@ local function addPlayerController( inst )
 
     controller.OnUpdate = function(salf, dt)
         originalFunctions.OnUpdate(salf,dt)
-        if(shouldToggleEnabled ~= nil) then
-            -- 记录上次用的是什么
-            ToggleModEnabled(salf,shouldToggleEnabled);
-            shouldToggleEnabled=nil;
-            return;
-        end
+        --if(shouldToggleEnabled ~= nil) then
+        --    -- 记录上次用的是什么
+        --    ToggleModEnabled(salf,shouldToggleEnabled);
+        --    shouldToggleEnabled=nil;
+        --    return;
+        --end
         if(modOptions.ENABLED) then
             -- 在这里调用了
             local successflag, retvalue = pcall(OnUpdate, salf, dt)

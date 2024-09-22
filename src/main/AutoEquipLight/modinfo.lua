@@ -56,6 +56,20 @@ configuration_options = {
         default=1
     },
 
+    -- 自动切换工具
+    {
+        name="ae_switchtools",
+        label="Enable tool switching?",
+        options = {
+            {description="No",data=0},
+            {description="Yes - 两者",data=1},
+            {description="Yes - 空格",data=2},
+            {description="Yes - 鼠标",data=3}
+        },
+        hover="Allows automatically switching of tools to allow more actions. Required for most features.",
+        default=1
+    },
+
     {
         name="ae_lightindark",
         label="Make light in the dark?",
