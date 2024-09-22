@@ -13,6 +13,9 @@ local GetTime = GLOBAL.GetTime
 local delayUnequipASecond = 0
 local hasEquipped = false;
 local letsDoDebug = true
+local forceResetTrap
+local forcePlantSapling
+local forcePlantSaplingPlacer
 
 --  正在修改这个
 local modOptions = {
@@ -46,12 +49,6 @@ local modOptions = {
     --REPAIR_WALLS = GetModConfigData("ae_repairwalls") > 0
 };
 
--- Functions --
-
-local forceResetTrap
-local forcePlantSapling
-local forcePlantSaplingPlacer
-
 
 -- 有一个按键控制到时候注意一下
 -- 自定义键位
@@ -60,6 +57,7 @@ if type(KEYBOARDTOGGLEKEY) == "string" then
     KEYBOARDTOGGLEKEY = KEYBOARDTOGGLEKEY:lower():byte()
 end
 
+-- 不知道干嘛的
 local TARGET_EXCLUDE_TAGS = { "FX", "NOCLICK", "DECOR", "INLIMBO" }
 local PICKUP_TARGET_EXCLUDE_TAGS = { "catchable" }
 local HAUNT_TARGET_EXCLUDE_TAGS = { "haunted", "catchable" }
@@ -68,20 +66,21 @@ for i, v in ipairs(TARGET_EXCLUDE_TAGS) do
     table.insert(HAUNT_TARGET_EXCLUDE_TAGS, v)
 end
 
+
 -- 用于装备工具或者武器的（配置inst物品）
 local function DoEquip( inst, tool )
     if( inst == nil or inst.components == nil or inst.components.playercontroller == nil or tool == nil ) then return end
 
     local plcotrl = inst.components.playercontroller
     if( plcotrl and plcotrl.inst and plcotrl.inst.replica and plcotrl.inst.replica.inventory ) then
-        if letsDoDebug then print("- Equipping tool/weapon:",tool) end
+        if letsDoDebug then print("-装备工具/武器:",tool) end
         -- 防止过快切换装备
         delayUnequipASecond = GetTime()+0.25
         hasEquipped = true;
 
         inst.replica.inventory:UseItemFromInvTile(tool)
     else
-        if letsDoDebug then print("Tried to equip, but failed.") end
+        if letsDoDebug then print("试图装备，但失败了。") end
     end
 end
 
@@ -90,10 +89,12 @@ end
 local function GetInventory( inst )
     return ( inst.components and inst.components.playercontroller and inst.components.inventory ) or ( inst.replica and inst.replica.inventory )
 end
--- 查找物品
+
+
+-- 查找符合的物品
 local function CustomFindItem( inst, inv, check )
     local items = inv and inv.GetItems and inv:GetItems() or inv.itemslots or nil
-    if not inst or not inv or not check or not items then if letsDoDebug then print("Something went wrong with the inventory...") end return nil end
+    if not inst or not inv or not check or not items then if letsDoDebug then print("库存出了点问题。。。") end return nil end
 
     local zeItem = nil
     local zeIndex = nil
@@ -122,49 +123,48 @@ local function CustomFindItem( inst, inv, check )
     end
 
     if(zeItem ~= nil) then zeItem.lastslot = zeIndex end
-
     return zeItem
 end
 
--- 自动装备和创建光源操作
+-- 查询照明装备
 local tookLightOut = nil
 local firstCheckedForDarkness = nil
 local function CheckIfInDarkness( inst )
     if( not firstCheckedForDarkness ) then
-        if letsDoDebug then print("Oh, it's dark...") end
+        if letsDoDebug then print("哦，天黑了") end
         firstCheckedForDarkness = GetTime()
     elseif( firstCheckedForDarkness and GetTime() > (firstCheckedForDarkness+2) ) then
-        if letsDoDebug then print("That's it, I'm equipping light!") end
+        if letsDoDebug then print("就是这样，我在装备光！") end
         firstCheckedForDarkness = nil
 
+
         -- 先查找是否有提灯
-        local possibleLights = CustomFindItem(inst, GetInventory(inst), function(item) return item:HasTag("light") and not item:HasTag("lightbattery") end) -- For now, just use whatever can be found
+        local possibleLights = CustomFindItem(inst, GetInventory(inst), function(item) return item:HasTag("light") and not item:HasTag("lightbattery") end)
         -- 判断是否有提灯，没有提灯或者燃料，就会查找火把
         if( possibleLights == nil or possibleLights.replica.inventoryitem.classified.percentused:value() < 1 )then
-            possibleLights = CustomFindItem(inst, GetInventory(inst), function(item) return item:HasTag("lighter") end) -- For now, just use whatever can be found
+            possibleLights = CustomFindItem(inst, GetInventory(inst), function(item) return item:HasTag("lighter") end)
         end
 
 
         if( possibleLights ) then
             if possibleLights then
-                if letsDoDebug then print("Equipping a light-source!") print(possibleLights) end
+                if letsDoDebug then print("已经配备了光源！") print(possibleLights) end
                 DoEquip(inst,possibleLights)
                 tookLightOut = true;
             else
-                if letsDoDebug then print("No lights found! Something went wrong...") end
+                if letsDoDebug then print("没有找到灯！出了点问题。。。") end
             end
         else
             if( modOptions.CREATE_LIGHT_IN_DARK ) then
-                if letsDoDebug then print("No lights found, but attempting to craft a light.") end
+                if letsDoDebug then print("没有找到灯，但正在尝试制作灯。") end
                 if( inst.replica and inst.replica.builder and inst.replica.builder.CanBuild and inst.replica.builder.MakeRecipeFromMenu and inst.replica.builder:CanBuild("torch") ) then
                     inst.replica.builder:MakeRecipeFromMenu(AllRecipes["torch"])
                     tookLightOut = true;
                 end
             else
-                if letsDoDebug then print("No lights found.") end
+                if letsDoDebug then print("没有找到灯。") end
             end
         end
-        -- Tag is "lighter"
     end
 end
 
@@ -176,7 +176,7 @@ local function GetEquippedItem(inst)
     return nil
 end
 
--- 有被调用
+-- 检查是否走出黑暗
 local function CheckIfOutOfDarkness( inst )
     if(tookLightOut == nil) then return end
 
@@ -194,43 +194,11 @@ local function IMS( plyctrl )
     return plyctrl.ismastersim
 end
 
--- 有被调用
-local function UpdateTreePlacer( info, doremove )
-    if(doremove and forcePlantSaplingPlacer) then
-        forcePlantSaplingPlacer:Remove()
-        return false
-    end
-
-    if(forcePlantSaplingPlacer and forcePlantSaplingPlacer:IsValid()) then
-        forcePlantSaplingPlacer.Transform:SetPosition(info[2].x,info[2].y,info[2].z)
-    else
-        forcePlantSaplingPlacer = CreateEntity()
-
-        local seedType = aa_seedTypes[info[1]]
-
-        forcePlantSaplingPlacer:AddTag("FX")
-        forcePlantSaplingPlacer.entity:SetCanSleep(false)
-        forcePlantSaplingPlacer.persists = false
-
-        forcePlantSaplingPlacer.entity:AddTransform()
-        forcePlantSaplingPlacer.entity:AddAnimState()
-        forcePlantSaplingPlacer.AnimState:SetBank(seedType)
-        forcePlantSaplingPlacer.AnimState:SetBuild(seedType)
-        forcePlantSaplingPlacer.AnimState:PlayAnimation("idle_planted", true)
-        forcePlantSaplingPlacer.AnimState:SetLightOverride(1)
-
-        forcePlantSaplingPlacer.AnimState:SetAddColour(.25, .25, .25, 0)
-
-        if(forcePlantSaplingPlacer and forcePlantSaplingPlacer:IsValid()) then
-            forcePlantSaplingPlacer.Transform:SetPosition(info[2].x,info[2].y,info[2].z)
-        end
-    end
-end
 
 -- 用于卸下工具或者武器的
 local function DoUnequip( plcotrl, force )
-    if( plcotrl and plcotrl.inst and plcotrl.inst.replica and plcotrl.inst.replica.inventory ) then -- plcotrl.autoequip_lastequipped ~= nil
-        if letsDoDebug then print("- Unequipping tool/weapon") end
+    if( plcotrl and plcotrl.inst and plcotrl.inst.replica and plcotrl.inst.replica.inventory ) then
+        if letsDoDebug then print("未装备的工具/武器") end
         hasEquipped = false;
         hasEquippedType = "";
         plcotrl.inst.replica.inventory:UseItemFromInvTile(plcotrl.inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS))
@@ -238,9 +206,7 @@ local function DoUnequip( plcotrl, force )
 end
 
 
-
--- attached to playercontroller.OnUpdate
--- 照明装备「处理动作」
+-- 照明装备「处理动作」【开关】
 local function OnUpdate(playercontroller, dt)
     if not playercontroller:IsEnabled() then return end
 
@@ -257,7 +223,7 @@ local function OnUpdate(playercontroller, dt)
         if  not isShineOutfit and GLOBAL.TheWorld.state.isnight and not GLOBAL.TheWorld.state.isfullmoon and playercontroller.inst.LightWatcher and not playercontroller.inst.LightWatcher:IsInLight() then CheckIfInDarkness(playercontroller.inst) elseif(  not (GLOBAL.TheWorld.state.isnight and not GLOBAL.TheWorld.state.isfullmoon and playercontroller.inst.LightWatcher and not playercontroller.inst.LightWatcher:IsInLight()) and firstCheckedForDarkness ) then firstCheckedForDarkness = nil elseif(not GLOBAL.TheWorld.state.isnight and tookLightOut ~= nil) then CheckIfOutOfDarkness(playercontroller.inst) end
     end
 
-    -- 如果 有动作，不执行代码
+    -- 不知道什么东西
     if( ( IMS(playercontroller) and not playercontroller.inst.sg:HasStateTag("idle") ) or ( not IMS(playercontroller) and not playercontroller.inst:HasTag("idle") ) ) then return end
     if TheInput:IsControlPressed(GLOBAL.CONTROL_PRIMARY) then return end
     if TheInput:IsControlPressed(GLOBAL.CONTROL_SECONDARY) then return end
@@ -267,94 +233,44 @@ local function OnUpdate(playercontroller, dt)
     if( ( IMS(playercontroller) and playercontroller.inst.sg:HasStateTag("doing") ) or ( not IMS(playercontroller) and playercontroller.inst:HasTag("doing") ) ) then return end
     if( ( IMS(playercontroller) and playercontroller.inst.sg:HasStateTag("attack") ) or ( not IMS(playercontroller) and playercontroller.inst:HasTag("attack") ) ) then return end
     if playercontroller.inst.replica.combat.target ~= nil then return end
-    -- print("switch to previous equipped item")
 
-    if( forcePlantSapling ) then forcePlantSapling = nil UpdateTreePlacer(nil,true) if letsDoDebug then print("Resetting tree sapling data!") end end
-    if( forceResetTrap ) then forceResetTrap = nil if letsDoDebug then print("Resetting trap data!") end end
-    if( forcePlantSaplingPlacer ) then UpdateTreePlacer(nil,true) end
 
     if not playercontroller.autoequip_lastequipped then return end
 
     if( playercontroller.autoequip_lastequipped and GetTime() < delayUnequipASecond ) then return end
-    if type(playercontroller.autoequip_lastequipped) == "string" then -- and not GetInventory(playercontroller.inst):IsFull()
+
+    if type(playercontroller.autoequip_lastequipped) == "string" then
+        -- 卸下工具
         DoUnequip(playercontroller)
         playercontroller.inst.autoequip_prioNextTarget = nil
     elseif type(playercontroller.autoequip_lastequipped) == "table" then
+        --装备工具
         DoEquip(playercontroller.inst,playercontroller.autoequip_lastequipped)
         playercontroller.inst.autoequip_prioNextTarget = nil
     end
+
     playercontroller.autoequip_lastequipped = nil
     playercontroller.inst.autoequip_prioNextTarget = nil
     playercontroller.inst.autoequip_prioNextAct = nil
 end
 
 
--- 整条线完成了修改
+-- 主程序
 local originalFunctions = {}
 local function addPlayerController( inst )
     local controller = inst
 
-    -- 这里应该是四个不同的功能
     originalFunctions.OnUpdate = controller.OnUpdate; -- 照明
-    --originalFunctions.GetActionButtonAction = controller.GetActionButtonAction; -- 自动切换工具
-    --originalFunctions.DoAction = controller.DoAction; -- 建造？
-    --originalFunctions.DoAttackButton = controller.DoAttackButton; -- 攻击
-
-    -- Ooooooo
-
     controller.OnUpdate = function(salf, dt)
         originalFunctions.OnUpdate(salf,dt)
-        --if(shouldToggleEnabled ~= nil) then
-        --    -- 记录上次用的是什么
-        --    ToggleModEnabled(salf,shouldToggleEnabled);
-        --    shouldToggleEnabled=nil;
-        --    return;
-        --end
         if(modOptions.ENABLED) then
-            -- 在这里调用了
+            -- 调用自动照明
             local successflag, retvalue = pcall(OnUpdate, salf, dt)
             if not successflag then
                 if letsDoDebug then print(retvalue) end
             end
         end
     end
-
-    --controller.GetActionButtonAction = function(salf,forced)
-    --    --print("Action button")
-    --    local bufferedaction = originalFunctions.GetActionButtonAction(salf,forced or salf.autoequip_prioNextTarget or nil)
-    --    local successflag, retvalue = pcall(GetActionButtonAction, salf, forced or salf.autoequip_prioNextTarget or nil, bufferedaction)
-    --    if not successflag then
-    --        if letsDoDebug then print("Ran default ABA with: ",bufferedaction) end
-    --        return bufferedaction
-    --    else
-    --        if letsDoDebug then print("Ran custom ABA with: ",retvalue) end
-    --        return retvalue
-    --    end
-    --end
-    --
-    --controller.DoAction = function(salf, bufferedaction)
-    --    --print("Action")
-    --    local successflag, retvalue = pcall(DoAction, salf, bufferedaction)
-    --    if( successflag and retvalue ) then
-    --        if letsDoDebug then print("Worked, sending:", retvalue) end
-    --        if( retvalue and type(retvalue) == "string" and retvalue == "empty" ) then
-    --            originalFunctions.DoAction(salf,nil)
-    --        else
-    --            originalFunctions.DoAction(salf,retvalue)
-    --        end
-    --    else
-    --        if letsDoDebug then print("Failed") end
-    --        originalFunctions.DoAction(salf,bufferedaction)
-    --    end
-    --end
-    --
-    --controller.DoAttackButton = function(salf)
-    --    local successflag, retvalue = pcall(DoAttackButton, salf)
-    --    if not successflag then
-    --        if letsDoDebug then print(retvalue) end
-    --    end
-    --    originalFunctions.DoAttackButton(salf)
-    --end
 end
 
 AddClassPostConstruct("components/playercontroller", addPlayerController)
