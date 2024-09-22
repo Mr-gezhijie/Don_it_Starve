@@ -2,8 +2,9 @@
 --- Created by GEZHIJIE.
 --- DateTime: 2024/9/21 23:20
 ---
+
 name = "Auto Equip Light(自动装备照亮)"
-description = "天黑的时候，自动装备照明工具"
+description = "天黑的时候，自动装备照明工具。\n天黑自动装备提灯，火炬。天亮自动卸下。\n装备顺序: 提灯 > 火炬 > 制作火炬。\n黑暗中，静止不动才会制作火炬。\n\nAutomatically equip lighting tools when it gets dark. \nAutomatically equip with lanterns and torches when it gets dark. Automatically unloaded at dawn. \nEquipment order: Lantern > Torch > Torch making. \nIn the darkness, only by staying still can a torch be made.\n\n--本mod最好搭配夜视使用。\n--本mod是改写代码\n"
 author = "GEZHIJIE"
 version = "1.0"
 forumthread = ""
@@ -33,53 +34,29 @@ for i = 1, 26 do
 end
 
 configuration_options = {
-    -- 设置 绑定键
-    {
-        name="autoequipopeningamesettings",
-        label="Binding key(绑定键)",
-        -- longlabel="Which button should open the in-game settings menu?",
-        options = keyslist,
-        default="L",
-        hover="Modify binding key「修改绑定键」"
-    },
-
-    -- 是否启动
-    {
-        name="ae_enablemod",
-        label="Enable mod?",
-        -- longlabel="This allows you to completely disable the mod from in-game. No use outside of the in-game menu.",
-        options = {
-            {description="No",data=0},
-            {description="Yes",data=1}
-        },
-        hover="This has no use outside of the in-game settings menu.",
-        default=1
-    },
-
-    -- 自动切换工具
-    {
-        name="ae_switchtools",
-        label="Enable tool switching?",
-        options = {
-            {description="No",data=0},
-            {description="Yes - 两者",data=1},
-            {description="Yes - 空格",data=2},
-            {description="Yes - 鼠标",data=3}
-        },
-        hover="Allows automatically switching of tools to allow more actions. Required for most features.",
-        default=1
-    },
-
     {
         name="ae_lightindark",
-        label="Make light in the dark?",
-        -- longlabel="(BETA) Make light when standing in darkness?",
-        hover="(BETA) This feature is very basic and will be built upon later.",
+        label="Is it made in the dark?",
+        hover="是否在黑暗中制作火炬？",
         options={
-            {description="No", data=0},
-            {description="仅装备", data=1},
-            {description="制作装备", data=2}
+            {description="NO", data=1 ,hover="仅仅装备照亮物品/Only equip illuminated items"},
+            {description="YES", data=2 ,hover="没有照亮物品，制作火炬/Without illuminating the item, make a torch"}
         },
-        default=0,
+        default=2,
+    },
+
+    {
+        name="ae_delay_time",
+        label="Equipment delay time",
+		hover="装备延迟时间",
+        options={
+            {description="0.20s", data=0.20 ,hover="建议2s或1s"},
+            {description="1s", data=1 ,hover="建议2s或1s"},
+            {description="2s", data=2 ,hover="建议2s或1s"},
+            {description="3s", data=3 ,hover="建议2s或1s"},
+            {description="4s", data=4 ,hover="建议2s或1s"},
+            {description="5s", data=5 ,hover="建议2s或1s"},
+        },
+        default=2,
     }
 }

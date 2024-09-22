@@ -17,36 +17,21 @@ local forceResetTrap
 local forcePlantSapling
 local forcePlantSaplingPlacer
 
---  正在修改这个
+--  mod配置
 local modOptions = {
-    ENABLED = GetModConfigData("ae_enablemod") > 0,
-    --IGNORE_RESTRICTIONS = GetModConfigData("autoequipignorerestrictions") > 0,
-    --IGNORE_SAPS = GetModConfigData("ae_alwaysignoresaps") > 0,
-    --
-    --TRY_PICKUP_NEARBY_TOOLS = GetModConfigData("ae_use_nearby_tools") > 0,
-    SWITCH_TOOLS_AUTO = GetModConfigData("ae_switchtools") == 1 or GetModConfigData("ae_switchtools") == 2,
-    --SWITCH_TOOLS_MOUSE = GetModConfigData("ae_switchtools") == 1 or GetModConfigData("ae_switchtools") == 3,
-    --EQUIP_WEAPONS = GetModConfigData("ae_equipweapon") > 0,
-    --CRITTERS_WITH_BOOMERANG = GetModConfigData("ae_boomcritters") > 0,
+    --ENABLED = GetModConfigData("ae_enablemod") > 0,
+    ENABLED = true,
 
     -- 创建
     CREATE_LIGHT_IN_DARK = GetModConfigData("ae_lightindark") > 1,
     -- 装备
     EQUIP_LIGHT_IN_DARK = GetModConfigData("ae_lightindark") > 0,
 
-    ECO_MODE = true,
-    --CRAFT_TOOLS_MOUSE = GetModConfigData("ae_crafttools_mouse") > 0,
-    --CRAFT_TOOLS_MOUSE_GOLDEN = GetModConfigData("ae_crafttools_mouse") > 1,
-    --CRAFT_TOOLS_AUTO = GetModConfigData("ae_crafttools") > 0,
-    --CRAFT_TOOLS_AUTO_GOLDEN = GetModConfigData("ae_crafttools") > 1,
-    --
-    IGNORE_TRAPS = false,
-    REACTIVATE_TRAPS = false,
-    --
-    --REPLANT_TREES = GetModConfigData("ae_replanttrees") > 0,
-    --REFUEL_FIRES = GetModConfigData("ae_refuelfires") > 0,
-    --REFUEL_FIRES_PRIORITIZE = GetModConfigData("ae_refuelfires"),
-    --REPAIR_WALLS = GetModConfigData("ae_repairwalls") > 0
+    -- 延迟时间
+    DELAY_TIME = GetModConfigData("ae_delay_time"),
+
+
+
 };
 
 
@@ -75,7 +60,7 @@ local function DoEquip( inst, tool )
     if( plcotrl and plcotrl.inst and plcotrl.inst.replica and plcotrl.inst.replica.inventory ) then
         if letsDoDebug then print("-装备工具/武器:",tool) end
         -- 防止过快切换装备
-        delayUnequipASecond = GetTime()+0.25
+        delayUnequipASecond = GetTime()+0.20
         hasEquipped = true;
 
         inst.replica.inventory:UseItemFromInvTile(tool)
@@ -133,7 +118,7 @@ local function CheckIfInDarkness( inst )
     if( not firstCheckedForDarkness ) then
         if letsDoDebug then print("哦，天黑了") end
         firstCheckedForDarkness = GetTime()
-    elseif( firstCheckedForDarkness and GetTime() > (firstCheckedForDarkness+2) ) then
+    elseif( firstCheckedForDarkness and GetTime() > (firstCheckedForDarkness + modOptions.DELAY_TIME) ) then
         if letsDoDebug then print("就是这样，我在装备光！") end
         firstCheckedForDarkness = nil
 
