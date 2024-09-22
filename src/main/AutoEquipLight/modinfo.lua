@@ -3,8 +3,8 @@
 --- DateTime: 2024/9/21 23:20
 ---
 
-name = "Auto Equip Light(自动装备照亮)"
-description = "天黑的时候，自动装备照明工具。\n天黑自动装备提灯，火炬。天亮自动卸下。\n装备顺序: 提灯 > 火炬 > 制作火炬。\n黑暗中，静止不动才会制作火炬。\n\nAutomatically equip lighting tools when it gets dark. \nAutomatically equip with lanterns and torches when it gets dark. Automatically unloaded at dawn. \nEquipment order: Lantern > Torch > Torch making. \nIn the darkness, only by staying still can a torch be made.\n\n--本mod最好搭配夜视使用。\n--本mod是改写代码\n"
+name = "Auto Equip Light(自动装备照明)"
+description = "本地mod，改编的是别人代码，进行了优化\n如果功能有什么建议和不足，欢迎留言\n马上更新\n天黑的时候，自动装备照明工具。\n天黑自动装备提灯，火炬。天亮自动卸下。\n装备顺序: 提灯 > 火炬 > 制作火炬。\n黑暗中，静止不动才会制作火炬。\n\nLocal mod, adapted from someone else's code, optimized\nIf you have any suggestions or shortcomings regarding the features, please feel free to leave a message\nUpdate now\nAutomatically equip lighting tools when it gets dark. \nAutomatically equip with lanterns and torches when it gets dark. Automatically unloaded at dawn. \nEquipment order: Lantern > Torch > Torch making. \nIn the darkness, only by staying still can a torch be made.\n\n"
 author = "GEZHIJIE"
 version = "1.0"
 forumthread = ""
