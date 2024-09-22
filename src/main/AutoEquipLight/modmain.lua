@@ -4,26 +4,15 @@
 ---
 
 local GLOBAL = GLOBAL;
-local require = GLOBAL.require;
 local pcall = GLOBAL.pcall
-local ACTIONS = GLOBAL.ACTIONS
-local BufferedAction = GLOBAL.BufferedAction
 local EQUIPSLOTS = GLOBAL.EQUIPSLOTS
-local TheSim = GLOBAL.TheSim
-local FindEntity = GLOBAL.FindEntity
 local TheInput = GLOBAL.TheInput
 local AllRecipes = GLOBAL.AllRecipes
 local GetTime = GLOBAL.GetTime
 
-local AASC = require("widgets/aas_new")
-local AALC = require("widgets/aas_lag")
-local PlayerProfile = require("playerprofile")
-
 local delayUnequipASecond = 0
 local hasEquipped = false;
 local letsDoDebug = true
-
-local Backup_GetActionButtonAction
 
 --  正在修改这个
 local modOptions = {
@@ -60,14 +49,9 @@ local modOptions = {
 -- Functions --
 
 local forceResetTrap
-local forceUnequipTool
 local forcePlantSapling
 local forcePlantSaplingPlacer
-local ToggleModEnabled
-local HasShownPredictiveWarning = nil;
-local STARTSCALE = 0.25
-local NORMSCALE = 1
-local controls = nil
+
 
 -- 有一个按键控制到时候注意一下
 -- 自定义键位
@@ -83,8 +67,6 @@ for i, v in ipairs(TARGET_EXCLUDE_TAGS) do
     table.insert(PICKUP_TARGET_EXCLUDE_TAGS, v)
     table.insert(HAUNT_TARGET_EXCLUDE_TAGS, v)
 end
-
-
 
 -- 用于装备工具或者武器的（配置inst物品）
 local function DoEquip( inst, tool )
@@ -102,6 +84,7 @@ local function DoEquip( inst, tool )
         if letsDoDebug then print("Tried to equip, but failed.") end
     end
 end
+
 
 -- 查看库存用途
 local function GetInventory( inst )
@@ -157,7 +140,6 @@ local function CheckIfInDarkness( inst )
         -- 先查找是否有提灯
         local possibleLights = CustomFindItem(inst, GetInventory(inst), function(item) return item:HasTag("light") and not item:HasTag("lightbattery") end) -- For now, just use whatever can be found
         -- 判断是否有提灯，没有提灯或者燃料，就会查找火把
-        if letsDoDebug then print("打印耐久度" .. tostring(possibleLights.replica.inventoryitem.classified.percentused:value()) ) end
         if( possibleLights == nil or possibleLights.replica.inventoryitem.classified.percentused:value() < 1 )then
             possibleLights = CustomFindItem(inst, GetInventory(inst), function(item) return item:HasTag("lighter") end) -- For now, just use whatever can be found
         end
@@ -186,7 +168,7 @@ local function CheckIfInDarkness( inst )
     end
 end
 
- -- 获取装备物品
+-- 获取装备物品
 local function GetEquippedItem(inst)
     if inst and inst.replica and inst.replica.inventory then
         return inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
@@ -207,11 +189,6 @@ local function CheckIfOutOfDarkness( inst )
     end
 end
 
--- 有被调用
-local function IsDefaultScreen()
-    return GLOBAL.TheFrontEnd:GetActiveScreen().name:find("HUD") ~= nil
-            and not(GLOBAL.ThePlayer.HUD:IsControllerCraftingOpen() or GLOBAL.ThePlayer.HUD:IsControllerInventoryOpen())
-end
 
 local function IMS( plyctrl )
     return plyctrl.ismastersim
@@ -260,22 +237,7 @@ local function DoUnequip( plcotrl, force )
     end
 end
 
--- 用于装备工具或者武器的（配置inst物品）
-local function DoEquip( inst, tool )
-    if( inst == nil or inst.components == nil or inst.components.playercontroller == nil or tool == nil ) then return end
 
-    local plcotrl = inst.components.playercontroller
-    if( plcotrl and plcotrl.inst and plcotrl.inst.replica and plcotrl.inst.replica.inventory ) then
-        if letsDoDebug then print("- Equipping tool/weapon:",tool) end
-        -- 防止过快切换装备
-        delayUnequipASecond = GetTime()+0.25
-        hasEquipped = true;
-
-        inst.replica.inventory:UseItemFromInvTile(tool)
-    else
-        if letsDoDebug then print("Tried to equip, but failed.") end
-    end
-end
 
 -- attached to playercontroller.OnUpdate
 -- 照明装备「处理动作」
@@ -290,20 +252,9 @@ local function OnUpdate(playercontroller, dt)
         isShineOutfit = true
     end
 
-
     -- 查看定义的判断什么时候开灯
     if modOptions.EQUIP_LIGHT_IN_DARK then
         if  not isShineOutfit and GLOBAL.TheWorld.state.isnight and not GLOBAL.TheWorld.state.isfullmoon and playercontroller.inst.LightWatcher and not playercontroller.inst.LightWatcher:IsInLight() then CheckIfInDarkness(playercontroller.inst) elseif(  not (GLOBAL.TheWorld.state.isnight and not GLOBAL.TheWorld.state.isfullmoon and playercontroller.inst.LightWatcher and not playercontroller.inst.LightWatcher:IsInLight()) and firstCheckedForDarkness ) then firstCheckedForDarkness = nil elseif(not GLOBAL.TheWorld.state.isnight and tookLightOut ~= nil) then CheckIfOutOfDarkness(playercontroller.inst) end
-    end
-    if(HasShownPredictiveWarning == nil) then
-        if(PlayerProfile:GetMovementPredictionEnabled() == false) then
-            if type(GLOBAL.ThePlayer) == "table" and type(GLOBAL.ThePlayer.HUD) == "table" and IsDefaultScreen() then
-                GLOBAL.TheFrontEnd:PushScreen(AALC())
-                HasShownPredictiveWarning = true;
-            end
-        else
-            HasShownPredictiveWarning = true;
-        end
     end
 
     -- 如果 有动作，不执行代码
@@ -340,7 +291,6 @@ end
 
 -- 整条线完成了修改
 local originalFunctions = {}
-local shouldToggleEnabled = nil
 local function addPlayerController( inst )
     local controller = inst
 
