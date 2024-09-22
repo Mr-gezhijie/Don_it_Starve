@@ -512,13 +512,6 @@ local function CheckIfInDarkness( inst )
         if letsDoDebug then print("That's it, I'm equipping light!") end
         firstCheckedForDarkness = nil
 
-
-
-
-
-
-
-
         -- 先查找是否有提灯
         local possibleLights = CustomFindItem(inst, GetInventory(inst), function(item) return item:HasTag("light") and not item:HasTag("lightbattery") end) -- For now, just use whatever can be found
         -- 判断是否有提灯，没有提灯或者燃料，就会查找火把
@@ -1319,6 +1312,7 @@ local function addPlayeractionpicker( inst, inst2, inst3 )
     originalFunctionsPicker.GetLeftClickActions = controller.GetLeftClickActions;
     originalFunctionsPicker.GetRightClickActions = controller.GetRightClickActions;
 
+    -- 左键
     controller.GetLeftClickActions = function(selfs, position, target, spellbook)
         local actions = originalFunctionsPicker.GetLeftClickActions(selfs,position,target, spellbook)
         local successflag, retvalue = pcall(GetClickActions, selfs, position, target, actions, spellbook)
@@ -1330,6 +1324,7 @@ local function addPlayeractionpicker( inst, inst2, inst3 )
         end
     end
 
+    -- 右键
     controller.GetRightClickActions = function(selfs, position, target, spellbook)
         local actions = originalFunctionsPicker.GetRightClickActions(selfs,position,target, spellbook)
         local successflag, retvalue = pcall(GetRightClickActions, selfs, position, target, actions, spellbook)
