@@ -4,7 +4,16 @@
 ---
 
 name = "Auto Equip Light(自动装备照明)"
-description = "本地mod，改编的是别人代码，进行了优化\n如果功能有什么建议和不足，欢迎留言\n马上更新\n天黑的时候，自动装备照明工具。\n天黑自动装备提灯，火炬。天亮自动卸下。\n装备顺序: 提灯 > 火炬 > 制作火炬。\n黑暗中，静止不动才会制作火炬。\n\nLocal mod, adapted from someone else's code, optimized\nIf you have any suggestions or shortcomings regarding the features, please feel free to leave a message\nUpdate now\nAutomatically equip lighting tools when it gets dark. \nAutomatically equip with lanterns and torches when it gets dark. Automatically unloaded at dawn. \nEquipment order: Lantern > Torch > Torch making. \nIn the darkness, only by staying still can a torch be made.\n\n"
+description = [[
+本地mod，改编的是别人代码，进行了优化
+如果功能有什么建议和不足，欢迎留言
+马上更新
+天黑的时候，自动装备照明工具。
+天黑自动装备提灯，火炬。天亮自动卸下。
+装备顺序: 提灯 > 火炬 > 制作火炬。
+黑暗中，静止不动才会制作火炬。
+]]
+
 author = "GEZHIJIE"
 version = "1.0"
 forumthread = ""
@@ -30,33 +39,33 @@ local keyslist = {}
 local string = ""
 for i = 1, 26 do
     local ch = string.char(KEY_A + i - 1)
-    keyslist[i] = {description = ch, data = ch}
+    keyslist[i] = { description = ch, data = ch }
 end
 
 configuration_options = {
     {
-        name="ae_lightindark",
-        label="Is it made in the dark?",
-        hover="是否在黑暗中制作火炬？",
-        options={
-            {description="NO", data=1 ,hover="仅仅装备照亮物品/Only equip illuminated items"},
-            {description="YES", data=2 ,hover="没有照亮物品，制作火炬/Without illuminating the item, make a torch"}
+        name = "ae_lightindark",
+        label = "Is it made in the dark?",
+        hover = "是否在黑暗中制作火炬？",
+        options = {
+            { description = "NO", data = 1, hover = "仅仅装备照亮物品/Only equip illuminated items" },
+            { description = "YES", data = 2, hover = "没有照亮物品，制作火炬/Without illuminating the item, make a torch" }
         },
-        default=2,
+        default = 2,
     },
 
     {
-        name="ae_delay_time",
-        label="Equipment delay time",
-		hover="装备延迟时间",
-        options={
-            {description="0.20s", data=0.20 ,hover="建议2s或1s"},
-            {description="1s", data=1 ,hover="建议2s或1s"},
-            {description="2s", data=2 ,hover="建议2s或1s"},
-            {description="3s", data=3 ,hover="建议2s或1s"},
-            {description="4s", data=4 ,hover="建议2s或1s"},
-            {description="5s", data=5 ,hover="建议2s或1s"},
+        name = "ae_delay_time",
+        label = "Equipment delay time",
+        hover = "装备延迟时间",
+        options = {
+            { description = "0.20s", data = 0.20, hover = "建议2s或1s" },
+            { description = "1s", data = 1, hover = "建议2s或1s" },
+            { description = "2s", data = 2, hover = "建议2s或1s" },
+            { description = "3s", data = 3, hover = "建议2s或1s" },
+            { description = "4s", data = 4, hover = "建议2s或1s" },
+            { description = "5s", data = 5, hover = "建议2s或1s" },
         },
-        default=2,
+        default = 2,
     }
 }
