@@ -3,8 +3,8 @@
 --- DateTime: 2024/9/21 23:20
 ---
 
-name = "Auto Equip Light(自动装备照明)"
---name = "AAAA"
+--name = "AutoLight(自动照明)"
+name = "AAAA"
 description = [[
 天黑自动装备照明工具
 
@@ -101,7 +101,7 @@ configuration_options = {
     {
         name = "ae_make_delay_time",
         label = "Equipment delay time",
-        hover = "制作火把延迟时间",
+        hover = "制作火把提示",
         options = {
             { description = "0.3s", data = 0.30, hover = "" },
             { description = "0.5s", data = 0.50, hover = "" },
@@ -113,6 +113,41 @@ configuration_options = {
             { description = "3s", data = 3, hover = "" },
 
         },
-        default = 0.75,
+        default = 1.50
+    },
+    {
+        name = "ae_no_night_put_down_light_time",
+        label = "Equipment delay time",
+        hover = "不是夜晚，几秒放下火把",
+        options = {
+            { description = "1s", data = 1, hover = "" },
+            { description = "2s", data = 2, hover = "" },
+            { description = "3s", data = 3, hover = "" },
+        },
+        default = 3,
+    },
+    {
+        name = "ae_encountering_light_time",
+        label = "Equipment delay time",
+        hover = "遇到光照延时几秒,卸下",
+        options = {
+            { description = "0s", data = 0, hover = "" },
+            { description = "0.5s", data = 0.5, hover = "" },
+            { description = "1s", data = 1, hover = "" },
+            { description = "1.5s", data = 1.5, hover = "" },
+            { description = "2s", data = 2, hover = "" },
+            { description = "3s", data = 3, hover = "" },
+        },
+        default = 1.5,
+    },
+    {
+        name = "ae_luminous_illumination",
+        label = "Equipment delay time",
+        hover = "是否刚出光就，装备照明",
+        options = {
+            { description = "NO", data = false, hover = "仅仅装备照亮物品/Only equip illuminated items" },
+            { description = "YES", data = true, hover = "没有照亮物品，制作火炬/Without illuminating the item, make a torch" }
+        },
+        default = false,
     }
 }
