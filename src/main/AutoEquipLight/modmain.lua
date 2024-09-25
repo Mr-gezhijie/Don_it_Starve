@@ -17,6 +17,7 @@ local forceResetTrap
 local forcePlantSapling
 local forcePlantSaplingPlacer
 
+
 --  mod配置
 local modOptions = {
     --ENABLED = GetModConfigData("ae_enablemod") > 0,
@@ -52,37 +53,62 @@ for i, v in ipairs(TARGET_EXCLUDE_TAGS) do
 end
 
 
--- 用于装备工具或者武器的（配置inst物品）
-local function DoEquip(inst, tool)
-    if (inst == nil or inst.components == nil or inst.components.playercontroller == nil or tool == nil) then
-        return
-    end
 
-    local plcotrl = inst.components.playercontroller
-    if (plcotrl and plcotrl.inst and plcotrl.inst.replica and plcotrl.inst.replica.inventory) then
-        if letsDoDebug then
-            print("-装备工具/武器:", tool)
-        end
-        -- 防止过快切换装备
-        --delayUnequipASecond = GetTime() + 0.20
-        --delayUnequipASecond = GetTime() + 0.20
-        hasEquipped = true;
-
-        inst.replica.inventory:UseItemFromInvTile(tool)
-    else
-        if letsDoDebug then
-            print("试图装备，但失败了。")
-        end
-    end
-end
-
-
--- 查看库存用途
+-- 检查参数用的，就这样吧，不改了
 local function GetInventory(inst)
     return (inst.components and inst.components.playercontroller and inst.components.inventory) or (inst.replica and inst.replica.inventory)
 end
 
+-- 判断是否照具
+local function IsCheckIfLighting(tool)
+    if (tool:HasTag("lighter")
+            or tool:HasTag("light")) then
+        return true
+    else
+        return false
+    end
+end
 
+
+-- 获取，指定位置物品，inst是玩家，position是部位
+local function GetEquippedItem(inst, position)
+    if inst and inst.replica and inst.replica.inventory then
+        return inst.replica.inventory:GetEquippedItem(position)
+    end
+    return nil
+end
+
+-- 把物品装备到手上
+local function DoEquip(inst, tool)
+    if (inst == nil or inst.components == nil or inst.components.playercontroller == nil or tool == nil) then
+        return
+    end
+    local plcotrl = inst.components.playercontroller
+    if (plcotrl and plcotrl.inst and plcotrl.inst.replica and plcotrl.inst.replica.inventory) then
+        hasEquipped = true;
+        inst.replica.inventory:UseItemFromInvTile(tool)
+    end
+end
+
+-- 用于卸下工具或者武器的
+local function DoUnequip(inst)
+    if (inst and inst.replica and inst.replica.inventory) then
+        hasEquipped = false;
+        local handEquipment =  GetEquippedItem(inst,EQUIPSLOTS.HANDS)
+        if handEquipment and IsCheckIfLighting(handEquipment) then
+            inst.replica.inventory:UseItemFromInvTile(handEquipment)
+        end
+    end
+end
+
+
+local function IMS(plyctrl)
+    return plyctrl.ismastersim
+end
+
+
+-- --------------------------------------------------------------
+-- --------------------------------------------------------------
 -- 查找符合的物品
 local function CustomFindItem(inst, inv, check)
     local items = inv and inv.GetItems and inv:GetItems() or inv.itemslots or nil
@@ -125,31 +151,12 @@ local function CustomFindItem(inst, inv, check)
     return zeItem
 end
 
--- 获取装备物品
-local function GetEquippedItem(inst, position)
-    if inst and inst.replica and inst.replica.inventory then
-        return inst.replica.inventory:GetEquippedItem(position)
-    end
-    return nil
-end
 
--- 用于卸下工具或者武器的
-local function DoUnequip(inst, force)
-    if (inst and inst.replica and inst.replica.inventory) then
-
-        hasEquipped = false;
-        hasEquippedType = "";
-        if inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) then
-            inst.replica.inventory:UseItemFromInvTile(inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS))
-        end
-    end
-end
-
+-- --------------------------------------------------------------
+-- --------------------------------------------------------------
 -- 查询照明装备
-local tookLightOut = nil
 local firstCheckedForDarkness = nil
 local isJustMakeTorch = true
-
 local function CheckIfInDarkness(inst)
     --if (not firstCheckedForDarkness) then
     if letsDoDebug then
@@ -158,12 +165,8 @@ local function CheckIfInDarkness(inst)
     if not firstCheckedForDarkness then
         firstCheckedForDarkness = GetTime()
     end
-    --elseif (firstCheckedForDarkness and GetTime() > (firstCheckedForDarkness + modOptions.DELAY_TIME)) then
-    --elseif (firstCheckedForDarkness and GetTime() > (firstCheckedForDarkness + modOptions.DELAY_TIME)) then
     if letsDoDebug then
-        --print("就是这样，我在装备光！")
     end
-    --firstCheckedForDarkness = nil
 
 
 
@@ -171,6 +174,7 @@ local function CheckIfInDarkness(inst)
     local possibleLights = CustomFindItem(inst, GetInventory(inst), function(item)
         return item:HasTag("light") and not item:HasTag("lightbattery")
     end)
+
     -- 判断是否有提灯，没有提灯或者燃料，就会查找火把
     if (possibleLights == nil or possibleLights.replica.inventoryitem.classified.percentused:value() < 1) then
         possibleLights = CustomFindItem(inst, GetInventory(inst), function(item)
@@ -181,20 +185,13 @@ local function CheckIfInDarkness(inst)
     -- 如果为空，就是什么也没有找到
     if (possibleLights) then
         if possibleLights then
-            --if letsDoDebug then
-            --    print("已经配备了光源！")
-            --end
-
             if letsDoDebug then
                 print("XXXXX！" .. tostring(isJustMakeTorch) .. "现在时间" .. GLOBAL.GetTime() .. "延迟时间" .. (firstCheckedForDarkness + modOptions.SWITCH_DELAY_TIME))
             end
-            --if letsDoDebug then
-            --    print("AAAAAA！" .. tostring(isJustMakeTorch or (firstCheckedForDarkness and GetTime() > (firstCheckedForDarkness + modOptions.SWITCH_DELAY_TIME))))
-            --end
+
 
             -- 冷却时间
             -- 如何是刚制作的火把，就不用冷却了，立马装备
-            --if (isJustMakeTorch or (firstCheckedForDarkness and GetTime() > (firstCheckedForDarkness + modOptions.SWITCH_DELAY_TIME))) then
             if  (firstCheckedForDarkness and GLOBAL.GetTime() > (firstCheckedForDarkness + modOptions.SWITCH_DELAY_TIME)) then
                 if letsDoDebug then
                     print("正在切换中！")
@@ -215,13 +212,11 @@ local function CheckIfInDarkness(inst)
                     end
                     -- 装备工具
                     DoEquip(inst, possibleLights)
-                    tookLightOut = true;
                     firstCheckedForDarkness = nil
                     --isJustMakeTorch = false
                 else
                     -- 装备工具
                     DoEquip(inst, possibleLights)
-                    tookLightOut = true;
                     firstCheckedForDarkness = nil
                     --isJustMakeTorch = false
                 end
@@ -241,9 +236,6 @@ local function CheckIfInDarkness(inst)
             if letsDoDebug then
                 print("没有找到灯，但正在尝试制作灯。")
             end
-            --if isJustMakeTorch then
-            --    return
-            --end
 
             if (firstCheckedForDarkness and GLOBAL.GetTime() > (firstCheckedForDarkness + modOptions.MAKE_DELAY_TIME)) then
                 -- 制作火把
@@ -268,7 +260,6 @@ local function CheckIfInDarkness(inst)
                     if isJustMakeTorch then
                         isJustMakeTorch = false
                         inst.replica.builder:MakeRecipeFromMenu(AllRecipes["torch"])
-                        tookLightOut = true;
                     end
 
 
@@ -282,80 +273,16 @@ local function CheckIfInDarkness(inst)
             end
         end
     end
-    --if letsDoDebug then
-    --    print("出去了。。。。")
-    --end
-    --end
 end
 
 
 
--- 检查是否走出黑暗
-local function CheckIfOutOfDarkness(inst)
-    if (tookLightOut == nil) then
-        return
-    end
 
-    local tool = inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS);
-    if (tool ~= nil) then
-        if (tool:HasTag("lighter") or tool:HasTag("light")) then
-            -- 卸下？
-            inst.replica.inventory:UseItemFromInvTile(inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS))
-            tookLightOut = nil;
-        end
-    end
-end
-
-local function IMS(plyctrl)
-    return plyctrl.ismastersim
-end
-
--- ------ -----
--- 获取玩家的位置
---local player_pos
---
----- 获取环境中的光照强度，排除火炬的光照
---local function get_environment_light_level(x,y,z, radius)
---    print("阐述1 ："..tostring(x,y,z))
---    local light_level = 0
---    local entities = GLOBAL.TheWorld:FindEntities(x,y,z, radius, {"lighter"})
---    print("阐述2 ："..tostring(entities))
---
---    local center_pos= GLOBAL.ThePlayer:GetPosition()
---
---    for i, entity in ipairs(entities) do
---        if entity.prefab ~= "torch" then
---            local light = entity.components.lighter
---            if light then
---                light_level = light_level + light:CalculateLightForPoint(center_pos)
---            end
---        end
---    end
---    return light_level
---end
---
---local function check_light_level()
---    local x, y ,z =  GLOBAL.ThePlayer:GetPosition()
---    local light_level = get_environment_light_level(x,y,z, 15)
---    local MIN_LIGHT_LEVEL = 14 -- 假设最小光照阈值为14
---    if light_level < MIN_LIGHT_LEVEL then
---        print("环境光照不足")
---    else
---        print("环境光照充足")
---    end
---end
-
-
--- --------- -------
-
+-- --------------------------------------------------------------
+-- --------------------------------------------------------------
 local playercontroller333
 -- 照明装备「处理动作」【开关】
 local function OnUpdate(playercontroller, dt)
-
-    -- 不知道是什么，反正开了他，Y键就不执行了
-    --if not playercontroller:IsEnabled() then
-    --    return
-    --end
 
     -- 是发光衣服
     local isShineOutfit = false
@@ -399,31 +326,17 @@ local function OnUpdate(playercontroller, dt)
             if playercontroller.inst.LightWatcher:GetLightAngle()
                     and playercontroller.inst.LightWatcher:GetLightAngle() ~= 0
                     and playercontroller.inst.LightWatcher:GetLightValue() > 0.88
-                    --and playercontroller.inst.LightWatcher:GetLightValue() < 1
                     and GetEquippedItem(playercontroller.inst, EQUIPSLOTS.HANDS)
                     and ( GetEquippedItem(playercontroller.inst, EQUIPSLOTS.HANDS):HasTag("light") or GetEquippedItem(playercontroller.inst, EQUIPSLOTS.HANDS):HasTag("lighter")) then
 
 
                 DoUnequip(playercontroller.inst)
-                --isJustMakeTorch = false
-                --TheSim:DoTaskInTime(0.20, function()
-                --    print("延迟1秒后执行的代码")
-                --    -- 在这里添加你想要延迟执行的代码
-                --end)
                 firstCheckedForDarkness = GLOBAL.GetTime()
             end
 
-            --if letsDoDebug then
-            --    print("走了吗？？？")
-            --end
-
-
-        elseif (not GLOBAL.TheWorld.state.isnight and tookLightOut ~= nil) then
-            if letsDoDebug then
-                print("走了吗22222？？？")
-            end
+        elseif (not GLOBAL.TheWorld.state.isnight) then
             -- 检测是否走出黑暗
-            CheckIfOutOfDarkness(playercontroller.inst)
+            DoUnequip(playercontroller.inst)
             firstCheckedForDarkness = null
         end
     end
@@ -484,7 +397,7 @@ local function OnUpdate(playercontroller, dt)
 
 end
 
-
+-- --------------------------------------------------------------
 -- 主程序
 local originalFunctions = {}
 local function addPlayerController(inst)

@@ -32,8 +32,13 @@ description = [[
 1。光照边缘小概率不摘光具（貌似游戏bug）
 2。延时装备光具，大概率不是设置的那个时间（确定游戏bug）
 
-一般功能都可以进行设置，如果还有那些地方不足欢迎留言
-此mod为搬运优化
+建议搭配Mod:
+https://steamcommunity.com/sharedfiles/filedetails/?id=3336583014
+
+此Mod为搬运优化
+如果你觉得这个Mod不错，麻烦点个赞！
+如果这个Mod，有哪里需要优化
+欢迎留言讨论！
 ]]
 
 author = "GEZHIJIE"
