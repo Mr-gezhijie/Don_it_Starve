@@ -1,6 +1,5 @@
 local CacheService, Cache = {}, {}
-local ComponentsUsed =
-{
+local ComponentsUsed = {
     "edible",
     "healer",
     "weapon",
@@ -23,8 +22,7 @@ local function CacheItem(item)
         return
     end
 
-    local cacheItem =
-    {
+    local cacheItem = {
         components = {}
     }
 
@@ -37,15 +35,14 @@ local function CacheItem(item)
     return cacheItem
 end
 
-local NotAllowed =
-{
+local NotAllowed = {
     ["blueprint"] = true,
     ["terrarium"] = true
 }
 
 local function AllowCache(item)
     return item
-       and not NotAllowed[item.prefab]
+            and not NotAllowed[item.prefab]
 end
 
 function CacheService:GetCachedItem(item)
