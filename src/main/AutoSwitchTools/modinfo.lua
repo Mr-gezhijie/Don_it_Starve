@@ -1,4 +1,4 @@
-name = "点击切装备"
+name = "AAAAAAAAAAAAAAAAAA"
 author = "萌萌的新"
 
 description =
