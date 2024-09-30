@@ -1002,7 +1002,7 @@ local function queryVicinity()
         local ent2 = FindEntity(ThePlayer, 6, nil, nil, TARGET_EXCLUDE_TAGS,TARGET_CONTAIN_TAGS)
         -- 附近有树了，我才会走
 
-        if ent2 then
+        if ent2 and ent2.prefab ~= "twiggytree" and ent2.prefab ~= "statueglommer" then
             -- 计算坐标偏差
             local x,y,z =  ent2.Transform:GetWorldPosition()
             local offset = 0.5
@@ -1079,7 +1079,7 @@ local function queryVicinity()
 
                 -- 树离得近就走这个
                 if article < article1 then
-                    print("x1---")
+                    --print("x1---")
                     local worktable2 = selectwork(ent2,false)
                     ClickEquip2.control_flag = { worktable = worktable2, lmb = true , physicalObject = ent2 ,pos2 = pos2}
                     ClickEquip2.overridelmbstr = nil
@@ -1087,7 +1087,7 @@ local function queryVicinity()
                     --pos = pos2
                 else
                     -- 树离得远，去捡其他东西
-                    print("x2")
+                    --print("x2")
                     ClickEquip2.overridelmbstr, ClickEquip2.overridermbstr, ClickEquip2.overridelmbcolor, ClickEquip2.overridermbcolor =
                     nil, nil, nil, nil
                     ClickEquip2.control_flag = {}
@@ -1098,7 +1098,7 @@ local function queryVicinity()
                 end
             else
                 -- 附近没东西走这个
-                print("x3----")
+                --print("x3----")
                 local worktable2 = selectwork(ent2,false)
                 ClickEquip2.control_flag = { worktable = worktable2, lmb = true , physicalObject = ent2,pos2 = pos2}
                 ClickEquip2.overridelmbstr = nil
@@ -1107,7 +1107,7 @@ local function queryVicinity()
             end
         else
             -- 附近什么都没有，走这个
-            print("x4")
+            --print("x4")
             ClickEquip2.overridelmbstr, ClickEquip2.overridermbstr, ClickEquip2.overridelmbcolor, ClickEquip2.overridermbcolor =
             nil, nil, nil, nil
             ClickEquip2.control_flag = {}
@@ -1205,7 +1205,6 @@ local function spaceKeyTriggersOperation()
     local worktable = ClickEquip2.control_flag.worktable
     local physicalObject = ClickEquip2.control_flag.physicalObject
     if TheInput:IsControlPressed(GLOBAL.CONTROL_ACTION) or TheInput:IsKeyDown(KEY_SPACE) then
-        print("xxxxxxx",worktable)
         if  worktable and physicalObject  then --确保是应该切的
             local pos2 = ClickEquip2.control_flag.pos2
             local tool = INV_util:FindInInv(worktable.toolprefab, worktable.tooltag, worktable.nottag, worktable.toolfn)
@@ -1223,7 +1222,6 @@ local function spaceKeyTriggersOperation()
             if action_x then
                 ThePlayer.components.playercontroller:DoAction(action_x)
             end
-
         end
     end
 end
