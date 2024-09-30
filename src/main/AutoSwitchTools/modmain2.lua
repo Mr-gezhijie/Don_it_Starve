@@ -13,9 +13,6 @@ local EquipSlot = require("equipslotutil")
 local GAME_util = {}
 local MOD_util = {}
 local status, settingscreen = pcall(require, "screens/settingsscreen")
-
-
-
 --获取设置
 function MOD_util:GetMOption(key, default)
     if rawget(_G, "m_options") and m_options[key] ~= nil then
@@ -368,8 +365,7 @@ function INV_util:FindInInventory(prefab, tags, fn) --如果都是nil会返回�
     end
 end
 
-local ClickEquip = { control_flag = {}, } -- 存储鼠标的
-local ClickEquip2 = { control_flag = {}, } -- 存储空格数据的
+local ClickEquip = { control_flag = {}, }
 local closefn = false
 ClickEquip.walktoact = GetModConfigData("walktoact") or true
 --当目标有这个动作的时候不会更换动作
@@ -406,7 +402,7 @@ local tagtable = {
         tooltag = 'MINE_tool',
         equiptool = true,
         isleftclick = true,
-        selectfn = function(ent) -- 查找物品，并且背包里有的
+        selectfn = function(ent)
             if INV_util:FindInInventory(nil, 'MINE_tool') then
                 return true
             end
@@ -935,12 +931,10 @@ function GLOBAL.AddHandTable(prefab, tab)
 end
 
 local lastent, lasthand, lasthentworktable, lasthandworktable
-local function selectwork(ent , determine)
-    if determine then
-        if not GAME_util:InGame() then return end
-        if fallfn(ent) then
-            return
-        end
+local function selectwork(ent)
+    if not GAME_util:InGame() then return end
+    if fallfn(ent) then
+        return
     end
     if lastent ~= ent then
         lastent = ent
@@ -992,138 +986,6 @@ local function isneed(v, prefabs, tags, nottags, fn)
         return true
     end
 end
-
--- 目标排除
-local TARGET_EXCLUDE_TAGS = { "FX", "NOCLICK", "DECOR", "INLIMBO" }
--- 目标包含
-local TARGET_CONTAIN_TAGS = { "CHOP_workable", "MINE_workable" }
-local function queryVicinity()
-    -- 附近有树才会操作的选项
-    if ThePlayer and ThePlayer.Transform then
-        -- 获取我自己的坐标
-        local xx, yy, zz = ThePlayer.Transform:GetWorldPosition()
-        -- 搜索我附近是否有树
-        local ent2 = FindEntity(ThePlayer, 6, nil, nil, TARGET_EXCLUDE_TAGS,TARGET_CONTAIN_TAGS)
-        -- 附近有树了，我才会走
-
-        if ent2 then
-            -- 计算坐标偏差
-            local x,y,z =  ent2.Transform:GetWorldPosition()
-            local offset = 0.5
-            if ent2:HasTag("MINE_workable") -- 不等于小范围的,处理石头的
-                    --and ent2.prefab ~= "moonrock_pieces"
-                    and ent2.prefab ~= "marbleshrub"
-                    and ent2.prefab ~= "marbletree"
-                    and ent2.prefab ~= "lunarrift_crystal_small"
-            then
-                -- 岩石树
-                if ent2.prefab == "rock_petrified_tree" and (ent2.AnimState:GetCurrentBankName() == "petrified_tree_short" or ent2.AnimState:GetCurrentBankName() == "petrified_tree_old") then
-                    offset = 0.5
-                    -- 月球风暴
-                elseif ent2.prefab == "moonstorm_glass_nub" then
-                    offset = 0.2
-                    -- 大理石雕像，水里的垃圾，中等的树,还有地下的一些石头
-                elseif ent2.prefab == "shell_cluster" or (ent2.prefab == "rock_petrified_tree" and ent2.AnimState:GetCurrentBankName() == "petrified_tree")
-                        or ent2.prefab == "statuemaxwell"
-                        or ent2.prefab == "statueharp"
-                        or ent2.prefab == "sculpture_knightbody"
-                        or ent2.prefab == "sculpture_bishopbody"
-                        or ent2.prefab == "statue_marble"
-                        or ent2.prefab == "archive_moon_statue"
-                        or string.find(ent2.prefab, "statue_marble_%a*")
-                        or string.find(ent2.prefab, "ruins_statue_%a*")
-                        or ent2.prefab == "cavein_boulder"
-                        or ent2.prefab == "dustmothden"
-                then
-                    offset = 0.8
-                    -- 蜘蛛巢/大理石雕像很大的那个
-                elseif ent2.prefab == "spiderhole" or ent2.prefab == "spiderhole_rock"
-                        or ent2.prefab == "moonspiderden" or ent2.prefab == "moonspider_spike"
-                        or ent2.prefab == "pond_cave" then
-                    offset = 1.8
-                    -- 月球岩石碎片
-                elseif ent2.prefab == "moonrock_pieces" then
-                    offset = 0.4
-                elseif ent2.prefab == "sculpture_rookbody" then
-                    offset = 1.5
-                else
-                    offset = 1
-                end
-            end
-
-            -- 浮木树，月球树
-            if ent2:HasTag("CHOP_workable")  -- 计算树的
-                    and (ent2.prefab == "driftwood_small1"
-                    or ent2.prefab == "driftwood_small2"
-                    or ent2.prefab == "moon_tree") then
-                offset = 1
-            elseif ent2:HasTag("CHOP_workable") and (
-                    ent2.prefab == "toadstool_cap"
-                            or ent2.prefab == "toadstool_cap_dark"
-            ) then
-                offset = 0.8
-            end
-
-            -- 计算最终应该走到哪个地方--排除碰撞体积
-            local target_x = x + offset * (xx - x > 0 and 1 or -1)
-            local target_z = z + offset * (zz - z > 0 and 1 or -1)
-
-            local pos2 =  Vector3(target_x,0,target_z)
-            -- 查询我的坐标 附近的其他物品
-            local excludeLabelItems = { "FX", "NOCLICK", "DECOR", "INLIMBO", "CHOP_workable", "MINE_workable" }
-            local contieneLabelItems = { "pickable","_inventoryitem"}
-            local ent_x = TheSim:FindEntities(xx, yy, zz, 6, nil, excludeLabelItems,contieneLabelItems)[1]
-
-            -- 有其他物品就会走
-            if ent_x  then
-                -- 其他物品坐标
-                local x1,y1,z1 =  ent_x.Transform:GetWorldPosition()
-                local article1 = math.sqrt((xx - x1)^2 + (yy - y1)^2 + (zz - z1)^2)
-                local article = math.sqrt((xx - x)^2 + (yy - y)^2 + (zz - z)^2)
-
-                -- 树离得近就走这个
-                if article < article1 then
-                    print("x1---")
-                    local worktable2 = selectwork(ent2,false)
-                    ClickEquip2.control_flag = { worktable = worktable2, lmb = true , physicalObject = ent2 ,pos2 = pos2}
-                    ClickEquip2.overridelmbstr = nil
-                    ClickEquip2.overridermbstr = nil
-                    --pos = pos2
-                else
-                    -- 树离得远，去捡其他东西
-                    print("x2")
-                    ClickEquip2.overridelmbstr, ClickEquip2.overridermbstr, ClickEquip2.overridelmbcolor, ClickEquip2.overridermbcolor =
-                    nil, nil, nil, nil
-                    ClickEquip2.control_flag = {}
-                    if ClickEquip2.reticule then
-                        ClickEquip2.reticule:Remove()
-                        ClickEquip2.reticule = nil
-                    end
-                end
-            else
-                -- 附近没东西走这个
-                print("x3----")
-                local worktable2 = selectwork(ent2,false)
-                ClickEquip2.control_flag = { worktable = worktable2, lmb = true , physicalObject = ent2,pos2 = pos2}
-                ClickEquip2.overridelmbstr = nil
-                ClickEquip2.overridermbstr = nil
-                --pos = pos2
-            end
-        else
-            -- 附近什么都没有，走这个
-            print("x4")
-            ClickEquip2.overridelmbstr, ClickEquip2.overridermbstr, ClickEquip2.overridelmbcolor, ClickEquip2.overridermbcolor =
-            nil, nil, nil, nil
-            ClickEquip2.control_flag = {}
-            if ClickEquip2.reticule then
-                ClickEquip2.reticule:Remove()
-                ClickEquip2.reticule = nil
-            end
-        end
-    end
-end
-
-
 local lastselectitem = nil
 AddComponentPostInit("playeractionpicker", function(self, inst)
     local old = self.DoGetMouseActions
@@ -1131,30 +993,22 @@ AddComponentPostInit("playeractionpicker", function(self, inst)
         local actiondate = {}
         --储存一下本来的动作 lmb and rmb
         actiondate.lmb, actiondate.rmb = old(self, position, target, spellbook)
-        --获取动作的对象，如果有传入的实体就用传入的实体  -- 鼠标下的实体
+        --获取动作的对象，如果有传入的实体就用传入的实体
         local ent = target or TheInput:GetWorldEntityUnderMouse()
         --获得写好的worktable {action overridestr overridecolor isleftclick selectfn needoncontrol oncontrolfn needreturn}
-        local worktable = selectwork(ent,true)
+        local worktable = selectwork(ent)
         local item = worktable and lastselectitem and PLAYER_util:IsHoldingItem(lastselectitem, true) and
             isneed(lastselectitem, worktable.toolprefab, worktable.tooltag, worktable.nottag, worktable.toolfn) and
             lastselectitem or
             worktable and
             INV_util:FindInInv(worktable.toolprefab, worktable.tooltag, worktable.nottag, worktable.toolfn)
         ---@diagnostic disable-next-line: redundant-parameter
-        local pos = TheInput:GetWorldPosition()
-
-        -- 查询附近物品，并加以记录
-        queryVicinity()
-
-        -- 鼠标点击触发的效果
-        if  worktable and (not worktable.fallfn or not worktable.fallfn(actiondate[worktable.isleftclick and 'lmb' or 'rmb' ], ent))
+        if worktable and (not worktable.fallfn or not worktable.fallfn(actiondate[worktable.isleftclick and 'lmb' or 'rmb'], ent))
             and item then
             lastselectitem = item
-            --local pos = TheInput:GetWorldPosition()
-
+            local pos = TheInput:GetWorldPosition()
             --todo 左右键同时生效
             if worktable.isleftclick == true then
-                --print("我按键点击了",pos)
                 if worktable.action then --noaction then not override it
                     actiondate.lmb = BufferedAction(ThePlayer, ent, worktable.action, nil, pos)
                 end
@@ -1162,7 +1016,6 @@ AddComponentPostInit("playeractionpicker", function(self, inst)
                 ClickEquip.overridelmbstr = ENT_util:FnOrNum(worktable.overridestr, ent)
                 ClickEquip.overridermbstr = nil
                 ClickEquip.overridelmbcolor = ENT_util:FnOrNum(worktable.overridecolor, ent)
-
             else
                 ClickEquip.control_flag = { worktable = worktable, rmb = true }
                 if worktable.action then
@@ -1173,8 +1026,7 @@ AddComponentPostInit("playeractionpicker", function(self, inst)
                 ClickEquip.overridermbcolor = ENT_util:FnOrNum(worktable.overridecolor, ent)
             end
             --辅助圈
-            if worktable and  worktable.creatreticule and (TheInput:IsKeyDown(KEY_LCTRL)or TheInput:IsControlPressed(GLOBAL.CONTROL_ACTION)) then
-                print("奇怪线圈")
+            if worktable.creatreticule and TheInput:IsKeyDown(KEY_LCTRL) then
                 if not ClickEquip.reticule then
                     ClickEquip.reticule = SpawnPrefab(worktable.reticuleprefab or "reticuleaoe")
                 end
@@ -1208,57 +1060,24 @@ AddComponentPostInit("playeractionpicker", function(self, inst)
     end
 end)
 
-
--- 空格按键触发操作
-local function spaceKeyTriggersOperation()
-    local worktable = ClickEquip2.control_flag.worktable
-    local physicalObject = ClickEquip2.control_flag.physicalObject
-    if TheInput:IsControlPressed(GLOBAL.CONTROL_ACTION) or TheInput:IsKeyDown(KEY_SPACE) then
-        print("xxxxxxx",worktable)
-        if  worktable and physicalObject  then --确保是应该切的
-            local pos2 = ClickEquip2.control_flag.pos2
-            local tool = INV_util:FindInInv(worktable.toolprefab, worktable.tooltag, worktable.nottag, worktable.toolfn)
-            if tool and ENT_util:FnOrNum(worktable.equiptool, tool) then
-                SendRPCToServer(RPC.ControllerUseItemOnSelfFromInvTile, ACTIONS.EQUIP.code, tool)
-            end
-            if worktable.oncontrolfn then
-                worktable.oncontrolfn({ item = tool, target = physicalObject })
-            end
-            if worktable.needreturn then
-                return
-            end
-            -- 处理行动动作
-            local action_x =  BufferedAction(ThePlayer,nil,  ACTIONS.WALKTO,nil ,pos2)
-            if action_x then
-                ThePlayer.components.playercontroller:DoAction(action_x)
-            end
-
-        end
-    end
-end
-
-
-
 AddComponentPostInit("playercontroller", function(self, inst)
     if inst ~= ThePlayer then return end
     local OldOnControl = self.OnControl                --这里是人物按的时候实现功能
     local controltable = {
         [rawget(GLOBAL, "CONTROL_PRIMARY")] = true,    --CONTROL_PRIMARY
-        --[rawget(GLOBAL, "CONTROL_ACTION")] = true,    --CONTROL_PRIMARY
         [rawget(GLOBAL, "CONTROL_SECONDARY")] = false, --CONTROL_SECONDARY
     }
     self.OnControl = function(self, control, down)
-        print('OnControl', down and controltable[control] ~= nil, control, down)
-        if down and (controltable[control] ~= nil or TheInput:IsKeyDown(KEY_LSHIFT))  then
+        --print('OnControl', down and controltable[control] ~= nil, control, down)
+        if down and controltable[control] ~= nil then
             ---111
             local ent = TheInput:GetWorldEntityUnderMouse()
             local worktable = ClickEquip.control_flag.worktable
-            --if (not TheInput:IsKeyDown(KEY_LSHIFT) and not ThePlayer.HUD:IsMapScreenOpen() --开了排队论
-            if (not ThePlayer.HUD:IsMapScreenOpen() --开了排队论
-                    and worktable and (worktable.isleftclick == controltable[control]) and worktable.needoncontrol
-            ) or (TheInput:IsControlPressed(GLOBAL.CONTROL_ACTION)) then
-                if  worktable and (ClickEquip.control_flag[controltable[control] and 'lmb' or 'rmb']) then --确保是应该切的
-                    local tool = INV_util:FindInInv(worktable.toolprefab, worktable.tooltag, worktable.nottag, worktable.toolfn)
+            if not TheInput:IsKeyDown(KEY_LSHIFT) and not ThePlayer.HUD:IsMapScreenOpen() --开了排队论
+                and worktable and (worktable.isleftclick == controltable[control]) and worktable.needoncontrol then
+                if ClickEquip.control_flag[controltable[control] and 'lmb' or 'rmb'] then --确保是应该切的
+                    local tool = INV_util:FindInInv(worktable.toolprefab, worktable.tooltag, worktable.nottag,
+                        worktable.toolfn)
                     if tool and ENT_util:FnOrNum(worktable.equiptool, tool) then
                         SendRPCToServer(RPC.ControllerUseItemOnSelfFromInvTile, ACTIONS.EQUIP.code, tool)
                     end
@@ -1271,11 +1090,6 @@ AddComponentPostInit("playercontroller", function(self, inst)
                 end
             end
         end
-
-
-        -- 处理空格键
-        spaceKeyTriggersOperation()
-
         return OldOnControl(self, control, down)
     end
 end)
