@@ -1,7 +1,7 @@
 
 local CHS = locale == "zh" or locale == "zhr"
 --name = "AAAAAAAAAAAAAAAAAA"
-name = "AutoSwitchTools 自动装备工具"
+name = "AutoSwitchTools 自动切换工具"
 author = "GEZHIJIE"
 
 description = CHS and [[
@@ -45,7 +45,7 @@ shipwrecked_compatible = false
 icon_atlas = "modicon.xml"
 icon = "modicon.tex"
 
-version = "1.1.1"
+version = "1.1.4"
 server_filter_tags = {}
 local null_options = {
 	{ description = "", data = "" }

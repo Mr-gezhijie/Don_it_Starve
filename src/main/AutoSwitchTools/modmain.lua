@@ -1238,7 +1238,7 @@ AddComponentPostInit("playercontroller", function(self, inst)
     }
     self.OnControl = function(self, control, down)
         --print('OnControl', down and controltable[control] ~= nil, control, down)
-        if down and (controltable[control] ~= nil or TheInput:IsKeyDown(KEY_LSHIFT))  then
+        if (controltable[control] ~= nil or TheInput:IsKeyDown(KEY_LSHIFT))  then
             ---111
             local ent = TheInput:GetWorldEntityUnderMouse()
             local worktable = ClickEquip.control_flag.worktable
@@ -1329,7 +1329,7 @@ local banprefab = {
 local oldgetent = GLOBAL.Sim.GetEntitiesAtScreenPoint
 function GLOBAL.Sim:GetEntitiesAtScreenPoint(...)
     local result = oldgetent(self, ...)
-    if result and result[1] == nil and (TheInput:IsKeyDown(KEY_LCTRL) or TheInput:IsKeyDown(KEY_LALT) or TheInput:IsKeyDown(KEY_LSHIFT))
+    if result and result[1] == nil and (TheInput:IsKeyDown(KEY_LCTRL) or TheInput:IsKeyDown(KEY_LALT))
         and MOD_util:GetMOption("clickequip_select", true) then
         local change = nil
         local mpos = TheInput:GetWorldPosition()
