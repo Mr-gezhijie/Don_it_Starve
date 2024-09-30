@@ -13,6 +13,9 @@ local EquipSlot = require("equipslotutil")
 local GAME_util = {}
 local MOD_util = {}
 local status, settingscreen = pcall(require, "screens/settingsscreen")
+
+
+
 --获取设置
 function MOD_util:GetMOption(key, default)
     if rawget(_G, "m_options") and m_options[key] ~= nil then
@@ -403,7 +406,7 @@ local tagtable = {
         tooltag = 'MINE_tool',
         equiptool = true,
         isleftclick = true,
-        selectfn = function(ent)
+        selectfn = function(ent) -- 查找物品，并且背包里有的
             if INV_util:FindInInventory(nil, 'MINE_tool') then
                 return true
             end
@@ -990,8 +993,9 @@ local function isneed(v, prefabs, tags, nottags, fn)
     end
 end
 
--- 我的函数
+-- 目标排除
 local TARGET_EXCLUDE_TAGS = { "FX", "NOCLICK", "DECOR", "INLIMBO" }
+-- 目标包含
 local TARGET_CONTAIN_TAGS = { "CHOP_workable", "MINE_workable" }
 local function queryVicinity()
     -- 附近有树才会操作的选项
@@ -1120,7 +1124,6 @@ local function queryVicinity()
 end
 
 
-
 local lastselectitem = nil
 AddComponentPostInit("playeractionpicker", function(self, inst)
     local old = self.DoGetMouseActions
@@ -1128,7 +1131,7 @@ AddComponentPostInit("playeractionpicker", function(self, inst)
         local actiondate = {}
         --储存一下本来的动作 lmb and rmb
         actiondate.lmb, actiondate.rmb = old(self, position, target, spellbook)
-        --获取动作的对象，如果有传入的实体就用传入的实体
+        --获取动作的对象，如果有传入的实体就用传入的实体  -- 鼠标下的实体
         local ent = target or TheInput:GetWorldEntityUnderMouse()
         --获得写好的worktable {action overridestr overridecolor isleftclick selectfn needoncontrol oncontrolfn needreturn}
         local worktable = selectwork(ent,true)
@@ -1138,16 +1141,20 @@ AddComponentPostInit("playeractionpicker", function(self, inst)
             worktable and
             INV_util:FindInInv(worktable.toolprefab, worktable.tooltag, worktable.nottag, worktable.toolfn)
         ---@diagnostic disable-next-line: redundant-parameter
+        local pos = TheInput:GetWorldPosition()
 
         -- 查询附近物品，并加以记录
         queryVicinity()
 
-        if worktable and (not worktable.fallfn or not worktable.fallfn(actiondate[worktable.isleftclick and 'lmb' or 'rmb'], ent))
+        -- 鼠标点击触发的效果
+        if  worktable and (not worktable.fallfn or not worktable.fallfn(actiondate[worktable.isleftclick and 'lmb' or 'rmb' ], ent))
             and item then
             lastselectitem = item
-            local pos = TheInput:GetWorldPosition()
+            --local pos = TheInput:GetWorldPosition()
+
             --todo 左右键同时生效
             if worktable.isleftclick == true then
+                --print("我按键点击了",pos)
                 if worktable.action then --noaction then not override it
                     actiondate.lmb = BufferedAction(ThePlayer, ent, worktable.action, nil, pos)
                 end
@@ -1155,6 +1162,7 @@ AddComponentPostInit("playeractionpicker", function(self, inst)
                 ClickEquip.overridelmbstr = ENT_util:FnOrNum(worktable.overridestr, ent)
                 ClickEquip.overridermbstr = nil
                 ClickEquip.overridelmbcolor = ENT_util:FnOrNum(worktable.overridecolor, ent)
+
             else
                 ClickEquip.control_flag = { worktable = worktable, rmb = true }
                 if worktable.action then
@@ -1165,7 +1173,8 @@ AddComponentPostInit("playeractionpicker", function(self, inst)
                 ClickEquip.overridermbcolor = ENT_util:FnOrNum(worktable.overridecolor, ent)
             end
             --辅助圈
-            if worktable.creatreticule and TheInput:IsKeyDown(KEY_LCTRL) then
+            if worktable and  worktable.creatreticule and (TheInput:IsKeyDown(KEY_LCTRL)or TheInput:IsControlPressed(GLOBAL.CONTROL_ACTION)) then
+                print("奇怪线圈")
                 if not ClickEquip.reticule then
                     ClickEquip.reticule = SpawnPrefab(worktable.reticuleprefab or "reticuleaoe")
                 end
@@ -1230,25 +1239,26 @@ end
 
 
 
-
 AddComponentPostInit("playercontroller", function(self, inst)
     if inst ~= ThePlayer then return end
     local OldOnControl = self.OnControl                --这里是人物按的时候实现功能
     local controltable = {
         [rawget(GLOBAL, "CONTROL_PRIMARY")] = true,    --CONTROL_PRIMARY
+        --[rawget(GLOBAL, "CONTROL_ACTION")] = true,    --CONTROL_PRIMARY
         [rawget(GLOBAL, "CONTROL_SECONDARY")] = false, --CONTROL_SECONDARY
     }
     self.OnControl = function(self, control, down)
-        --print('OnControl', down and controltable[control] ~= nil, control, down)
+        print('OnControl', down and controltable[control] ~= nil, control, down)
         if down and (controltable[control] ~= nil or TheInput:IsKeyDown(KEY_LSHIFT))  then
             ---111
             local ent = TheInput:GetWorldEntityUnderMouse()
             local worktable = ClickEquip.control_flag.worktable
-            if not ThePlayer.HUD:IsMapScreenOpen() --开了排队论
-                and worktable and (worktable.isleftclick == controltable[control]) and worktable.needoncontrol then
-                if ClickEquip.control_flag[controltable[control] and 'lmb' or 'rmb'] then --确保是应该切的
-                    local tool = INV_util:FindInInv(worktable.toolprefab, worktable.tooltag, worktable.nottag,
-                        worktable.toolfn)
+            --if (not TheInput:IsKeyDown(KEY_LSHIFT) and not ThePlayer.HUD:IsMapScreenOpen() --开了排队论
+            if (not ThePlayer.HUD:IsMapScreenOpen() --开了排队论
+                    and worktable and (worktable.isleftclick == controltable[control]) and worktable.needoncontrol
+            ) or (TheInput:IsControlPressed(GLOBAL.CONTROL_ACTION)) then
+                if  worktable and (ClickEquip.control_flag[controltable[control] and 'lmb' or 'rmb']) then --确保是应该切的
+                    local tool = INV_util:FindInInv(worktable.toolprefab, worktable.tooltag, worktable.nottag, worktable.toolfn)
                     if tool and ENT_util:FnOrNum(worktable.equiptool, tool) then
                         SendRPCToServer(RPC.ControllerUseItemOnSelfFromInvTile, ACTIONS.EQUIP.code, tool)
                     end
@@ -1261,6 +1271,7 @@ AddComponentPostInit("playercontroller", function(self, inst)
                 end
             end
         end
+
 
         -- 处理空格键
         spaceKeyTriggersOperation()
