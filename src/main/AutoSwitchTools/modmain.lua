@@ -1015,19 +1015,13 @@ AddComponentPostInit("playeractionpicker", function(self, inst)
         local pos = TheInput:GetWorldPosition()
 
 
-        --ClickEquip2
-
         -- 搜索需要的那个
         if ThePlayer and ThePlayer.Transform then
             local xx, yy, zz = ThePlayer.Transform:GetWorldPosition()
 
-            local ent2 = FindEntity(ThePlayer, 4.5, nil, nil, TARGET_EXCLUDE_TAGS,TARGET_CONTAIN_TAGS)
+            local ent2 = FindEntity(ThePlayer, 6, nil, nil, TARGET_EXCLUDE_TAGS,TARGET_CONTAIN_TAGS)
             -- 搜索半径内所有的物品
             -- 我距离附近物品的距离
-            -- 排除标签项
-            local excludeLabelItems = { "FX", "NOCLICK", "DECOR", "INLIMBO", "CHOP_workable", "MINE_workable" }
-            local ent_x = TheSim:FindEntities(xx, yy, zz, 4.5, nil, excludeLabelItems)[2]
-
 
             -- 附近有树了，我才会走
             if ent2 then
@@ -1040,39 +1034,64 @@ AddComponentPostInit("playeractionpicker", function(self, inst)
                         and ent2.prefab ~= "marbletree"
                         and ent2.prefab ~= "lunarrift_crystal_small"
                 then
+                    -- 岩石树
                     if ent2.prefab == "rock_petrified_tree" and (ent2.AnimState:GetCurrentBankName() == "petrified_tree_short" or ent2.AnimState:GetCurrentBankName() == "petrified_tree_old") then
                         offset = 0.5
+                        -- 月球风暴
                     elseif ent2.prefab == "moonstorm_glass_nub" then
                         offset = 0.2
-                    elseif ent2.prefab == "shell_cluster" or (ent2.prefab == "rock_petrified_tree" and ent2.AnimState:GetCurrentBankName() == "petrified_tree") then
-                        offset = 0.8
-                    --elseif  then
-
-                        elseif ent2.prefab == "spiderhole" or ent2.prefab == "spiderhole_rock"
-                    or  ent2.prefab == "moonspiderden"or  ent2.prefab == "moonspider_spike"
+                        -- 大理石雕像，水里的垃圾，中等的树,还有地下的一些石头
+                    elseif ent2.prefab == "shell_cluster" or (ent2.prefab == "rock_petrified_tree" and ent2.AnimState:GetCurrentBankName() == "petrified_tree")
+                            or ent2.prefab == "statuemaxwell"
+                            or ent2.prefab == "statueharp"
+                            or ent2.prefab == "sculpture_knightbody"
+                            or ent2.prefab == "sculpture_bishopbody"
+                            or ent2.prefab == "statue_marble"
+                            or ent2.prefab == "archive_moon_statue"
+                            or string.find(ent2.prefab, "statue_marble_%a*")
+                            or string.find(ent2.prefab, "ruins_statue_%a*")
+                            or ent2.prefab == "cavein_boulder"
+                            or ent2.prefab == "dustmothden"
                     then
-                    offset = 1.8  -- 蜘蛛巢
-                    elseif  ent2.prefab == "moonrock_pieces" then
-                    offset = 0.4
+                        offset = 0.8
+                        -- 蜘蛛巢/大理石雕像很大的那个
+                    elseif ent2.prefab == "spiderhole" or ent2.prefab == "spiderhole_rock"
+                            or ent2.prefab == "moonspiderden" or ent2.prefab == "moonspider_spike"
+                        or ent2.prefab == "pond_cave" then
+                        offset = 1.8
+                        -- 月球岩石碎片
+                    elseif ent2.prefab == "moonrock_pieces" then
+                        offset = 0.4
+                    elseif ent2.prefab == "sculpture_rookbody" then
+                        offset = 1.5
                     else
-                    offset = 1
-                        end
+                        offset = 1
+                    end
                 end
-                if ent2:HasTag("CHOP_workable")
+
+                -- 浮木树，月球树
+                if ent2:HasTag("CHOP_workable")  -- 计算树的
                         and (ent2.prefab == "driftwood_small1"
                         or ent2.prefab == "driftwood_small2"
-                or ent2.prefab == "moon_tree") then
+                        or ent2.prefab == "moon_tree") then
                     offset = 1
-
+                elseif ent2:HasTag("CHOP_workable") and (
+                        ent2.prefab == "toadstool_cap"
+                                or ent2.prefab == "toadstool_cap_dark"
+                ) then
+                    offset = 0.8
 
                 end
-                offset =  ent2:GetPhysicsRadius(0) + 0.1
-                print("物理半径？？？？",xxxxxx)
-                print("aaaaaaaaaaaa",offset)
                 local target_x = x + offset * (xx - x > 0 and 1 or -1)
                 local target_z = z + offset * (zz - z > 0 and 1 or -1)
 
-                local pos2 =  Vector3(target_x,y,target_z)
+                local pos2 =  Vector3(target_x,0,target_z)
+                -- 排除标签项
+                local excludeLabelItems = { "FX", "NOCLICK", "DECOR", "INLIMBO", "CHOP_workable", "MINE_workable" }
+                local contieneLabelItems = { "pickable","_inventoryitem"}
+                local ent_x = TheSim:FindEntities(xx, yy, zz, 6, nil, excludeLabelItems,contieneLabelItems)[1]
+
+                print("eeeee",ent_x)
                 if ent_x  then
                     local x1,y1,z1 =  ent_x.Transform:GetWorldPosition()
                     local article1 = math.sqrt((xx - x1)^2 + (yy - y1)^2 + (zz - z1)^2)
@@ -1080,12 +1099,14 @@ AddComponentPostInit("playeractionpicker", function(self, inst)
                     local article = math.sqrt((xx - x)^2 + (yy - y)^2 + (zz - z)^2)
 
                     if article < article1 then
+                        print("x1---")
                         local worktable2 = selectwork(ent2,false)
                         ClickEquip2.control_flag = { worktable = worktable2, lmb = true , physicalObject = ent2 ,pos2 = pos2}
                         ClickEquip2.overridelmbstr = nil
                         ClickEquip2.overridermbstr = nil
                         pos = pos2
                     else
+                        print("x2")
                         ClickEquip2.overridelmbstr, ClickEquip2.overridermbstr, ClickEquip2.overridelmbcolor, ClickEquip2.overridermbcolor =
                         nil, nil, nil, nil
                         ClickEquip2.control_flag = {}
@@ -1095,14 +1116,15 @@ AddComponentPostInit("playeractionpicker", function(self, inst)
                         end
                     end
                 else
+                    print("x3----")
                     local worktable2 = selectwork(ent2,false)
                     ClickEquip2.control_flag = { worktable = worktable2, lmb = true , physicalObject = ent2,pos2 = pos2}
                     ClickEquip2.overridelmbstr = nil
                     ClickEquip2.overridermbstr = nil
-
                     pos = pos2
                 end
             else
+                print("x4")
                 ClickEquip2.overridelmbstr, ClickEquip2.overridermbstr, ClickEquip2.overridelmbcolor, ClickEquip2.overridermbcolor =
                 nil, nil, nil, nil
                 ClickEquip2.control_flag = {}
@@ -1249,13 +1271,10 @@ AddComponentPostInit("playercontroller", function(self, inst)
         --if down  then
             local worktable = ClickEquip2.control_flag.worktable
             local physicalObject = ClickEquip2.control_flag.physicalObject
-            --if TheInput:IsKeyDown(KEY_SPACE) then
-            if TheInput:IsControlPressed(GLOBAL.CONTROL_ACTION)then
+            if TheInput:IsControlPressed(GLOBAL.CONTROL_ACTION) or TheInput:IsKeyDown(KEY_SPACE) then
                 print("xxxxxxx",worktable)
                 if  worktable and physicalObject  then --确保是应该切的
                     local pos2 = ClickEquip2.control_flag.pos2
-
-
 
                     print("空格-1",worktable)
                     local tool = INV_util:FindInInv(worktable.toolprefab, worktable.tooltag, worktable.nottag, worktable.toolfn)
@@ -1270,7 +1289,6 @@ AddComponentPostInit("playercontroller", function(self, inst)
                     if worktable.needreturn then
                         return
                     end
-
 
                     local action_x =  BufferedAction(ThePlayer,nil,  ACTIONS.WALKTO,nil ,pos2)
                     if action_x then
