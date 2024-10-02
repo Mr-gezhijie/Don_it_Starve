@@ -56,7 +56,7 @@ Welcome to leave a message for discussion!
 ]]
 
 author = "GEZHIJIE"
-version = "1.2.4"
+version = "1.2.5"
 
 forumthread = ""
 
@@ -175,6 +175,15 @@ configuration_options = {
     {
         name = "reskin_tool",
         label = CHS and "清洁扫把" or "reskin_tool",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+    {
+        name = "bugnet",
+        label = CHS and "捕虫网" or "bugnet",
         options = {
             { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
             { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
@@ -317,8 +326,8 @@ configuration_options = {
         default = true,
     },
     {
-        name = "minifan",
-        label = CHS and "旋转的风扇（小风车）" or "minifan",
+        name = "stars_staff",
+        label = CHS and "唤星/月者法杖" or "stars_staff",
         options = {
             { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
             { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
@@ -326,8 +335,8 @@ configuration_options = {
         default = true,
     },
     {
-        name = "balloon",
-        label = CHS and "普通气球" or "balloon",
+        name = "fires_ice_staff",
+        label = CHS and "冰/火法杖" or "fires_ice_staff",
         options = {
             { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
             { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
@@ -335,8 +344,8 @@ configuration_options = {
         default = true,
     },
     {
-        name = "balloonparty",
-        label = CHS and "派对气球" or "balloonparty",
+        name = "boomerang",
+        label = CHS and "回旋镖" or "boomerang",
         options = {
             { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
             { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
@@ -344,8 +353,44 @@ configuration_options = {
         default = true,
     },
     {
-        name = "balloonspeed",
-        label = CHS and "迅捷气球" or "balloonspeed",
+        name = "spear_wathgrithr_lightning",
+        label = CHS and "奔雷矛" or "spear_wathgrithr_lightning",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+    {
+        name = "nightstick",
+        label = CHS and "晨星锤" or "nightstick",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+    {
+        name = "sleep_fire_yellow_blowdart",
+        label = CHS and "催眠/火焰/雷电吹箭" or "sleep_fire_yellow_blowdart",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+    {
+        name = "trident",
+        label = CHS and "刺耳三叉戟" or "trident",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+    {
+        name = "staff_tornado",
+        label = CHS and "天气风向标" or "staff_tornado",
         options = {
             { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
             { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
@@ -414,6 +459,42 @@ configuration_options = {
             { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
         },
         default = false,
+    },
+    {
+        name = "minifan",
+        label = CHS and "旋转的风扇（小风车）" or "minifan",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+    {
+        name = "balloon",
+        label = CHS and "普通气球" or "balloon",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+    {
+        name = "balloonparty",
+        label = CHS and "派对气球" or "balloonparty",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+    {
+        name = "balloonspeed",
+        label = CHS and "迅捷气球" or "balloonspeed",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
     },
 
 }

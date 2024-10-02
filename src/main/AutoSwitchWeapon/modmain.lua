@@ -35,6 +35,7 @@ local TOOL_LIST = {
     -- 我新加入的
     lighter = GetModConfigData("lighter"), -- 薇洛的打火机
     reskin_tool = GetModConfigData("reskin_tool"), -- 清洁扫把
+    bugnet = GetModConfigData("bugnet"), -- 捕虫网
     shovel = GetModConfigData("shovel"), -- 铲子
     goldenshovel = GetModConfigData("goldenshovel"), -- 黄金铲子
     pitchfork = GetModConfigData("pitchfork"), -- 干草叉
@@ -50,10 +51,20 @@ local TOOL_LIST = {
     voidcloth_umbrella = GetModConfigData("voidcloth_umbrella"), -- 暗影伞
     voidcloth_scythe = GetModConfigData("voidcloth_scythe"), -- 暗影镰刀
     telestaff = GetModConfigData("telestaff"), -- 传送魔杖
-    minifan = GetModConfigData("minifan"), -- 旋转的风扇（小风车）
-    balloon = GetModConfigData("balloon"), -- 气球
-    balloonparty = GetModConfigData("balloonparty"), -- 派对气球
-    balloonspeed = GetModConfigData("balloonspeed"), -- 迅捷气球
+
+    yellowstaff = GetModConfigData("stars_staff"), -- 唤星者法杖
+    opalstaff = GetModConfigData("stars_staff"), -- 唤月者法杖
+    firestaff = GetModConfigData("fires_ice_staff"), -- 火魔杖
+    icestaff = GetModConfigData("fires_ice_staff"), -- 冰魔杖
+    boomerang = GetModConfigData("boomerang"), -- 回旋镖
+    spear_wathgrithr_lightning = GetModConfigData("spear_wathgrithr_lightning"), -- 奔雷矛
+    nightstick = GetModConfigData("nightstick"), -- 晨星锤
+    blowdart_sleep = GetModConfigData("sleep_fire_yellow_blowdart"), -- 催眠吹箭
+    blowdart_fire = GetModConfigData("sleep_fire_yellow_blowdart"), -- 火焰吹箭
+    blowdart_yellow = GetModConfigData("sleep_fire_yellow_blowdart"), -- 雷电吹箭
+    trident = GetModConfigData("trident"), -- 刺耳三叉戟
+    staff_tornado = GetModConfigData("staff_tornado"), -- 天气风向标
+
     moonglassaxe = GetModConfigData("moonglassaxe"), -- 月光玻璃斧
     multitool_axe_pickaxe = GetModConfigData("multitool_axe_pickaxe"), -- 多用斧稿
     staff_lunarplant = GetModConfigData("staff_lunarplant"), -- 亮茄魔杖
@@ -61,6 +72,10 @@ local TOOL_LIST = {
     bomb_lunarplant = GetModConfigData("bomb_lunarplant"), -- 亮茄炸弹
     shovel_lunarplant = GetModConfigData("shovel_lunarplant"), -- 亮茄锄铲
     pickaxe_lunarplant = GetModConfigData("pickaxe_lunarplant"), -- 亮茄粉碎者
+    minifan = GetModConfigData("minifan"), -- 旋转的风扇（小风车）
+    balloon = GetModConfigData("balloon"), -- 气球
+    balloonparty = GetModConfigData("balloonparty"), -- 派对气球
+    balloonspeed = GetModConfigData("balloonspeed"), -- 迅捷气球
 
 }
 
