@@ -6,6 +6,20 @@ local Autoswitch = Class(function(self, inst)
     self.isSpinning = false -- false是启用，true是关闭
     self.weaponList = {}
     self.toolList = {}
+    self.allowedMap = {
+        ["orangestaff"] = true, -- 懒人手杖
+        ["cane"] = true, -- 步行手杖
+        ["walking_stick"] = true,  -- 木手杖
+        ["ruins_bat"] = true, -- 铥矿棒
+        ["balloonspeed"] = true, -- 敏捷气球
+    }
+    self.allowedArr = {
+        "orangestaff", -- 懒人手杖
+        "cane", -- 步行手杖
+        "walking_stick",  -- 木手杖
+        "ruins_bat", -- 铥矿棒
+        "balloonspeed", -- 敏捷气球
+    }
 end)
 local CHS = true
 
@@ -30,14 +44,14 @@ function Autoswitch:SwitchSpinning()
     end
     if self.isSpinning then
         -- 禁用
-        ChatHistory:AddToHistory(ChatTypes.Message, nil, nil, ability_x, disable_x, PLAYERCOLOURS.CORAL)
+        ChatHistory:AddToHistory(ChatTypes.Message, nil, nil, ability_x, disable_x, PLAYERCOLOURS.GREEN)
         -- ChatHistory:SendCommandResponse('自动切手杖:关闭')
         self.inst:StopUpdatingComponent(self)
         self.isSpinning = false
         self:IconHide()
     else
         -- 启用
-        ChatHistory:AddToHistory(ChatTypes.Message, nil, nil, ability_x, enable_x, PLAYERCOLOURS.CORAL)
+        ChatHistory:AddToHistory(ChatTypes.Message, nil, nil, ability_x, enable_x, PLAYERCOLOURS.GREEN)
         -- ChatHistory:SendCommandResponse('自动切手杖:启动')
         self.inst:StartUpdatingComponent(self)
         self.isSpinning = true
@@ -138,6 +152,44 @@ function Autoswitch:IsAttacking()
     end
 end
 
+-- 手杖优先级排序TWO
+function Autoswitch:AcceleraEquipSort(sortedItems,inventoryList)
+    -- 先加速物品
+    for prefab, key in pairs(self.allowedArr) do
+        print("ceshiaaaaa",key)
+        for i, itemPrefab in ipairs(inventoryList) do
+            print("ceshibbbbbb",itemPrefab.prefab)
+            if itemPrefab.prefab == key then
+                print("ceshicccccc","添加了",inventoryList[i])
+                table.insert(sortedItems, inventoryList[i])
+                table.remove(inventoryList, i)
+                break
+            end
+        end
+    end
+end
+
+-- 手杖优先级排序ONE
+function Autoswitch:AcceleraEquipFinalSort(inventoryList)
+    -- mod的优先，再次是游戏加速装备
+    local yesGameEquipmentList = {} -- 游戏里的加速装备
+    local gameEquipmentList = {} -- mod里的游戏加速装备
+
+    for  _, item in pairs(inventoryList) do
+        if self:IsCaneItem(item) then
+            if self.allowedMap[item.prefab] then
+                table.insert(yesGameEquipmentList,item)
+            else
+                table.insert(gameEquipmentList,item)
+            end
+        end
+    end
+
+    self:AcceleraEquipSort(gameEquipmentList,yesGameEquipmentList)
+
+    return gameEquipmentList
+end
+
 -- 装备武器
 function Autoswitch:TryEquipWeaponItem()
     local item = ThePlayer.replica.inventory:GetItemInSlot(self.chipSlot)
@@ -147,7 +199,9 @@ function Autoswitch:TryEquipWeaponItem()
 end
 
 function Autoswitch:TryEquipCaneItem()
+    -- 不知道因为什么，反之这个获取的是无序的
     local inventoryList = ThePlayer.replica.inventory:GetItems()
+
     local handItem = ThePlayer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
     -- 如果手持XXX则不切换手杖
     if handItem and self:IsToolItem(handItem) then
@@ -160,11 +214,13 @@ function Autoswitch:TryEquipCaneItem()
         return
     end
 
-    for _, item in pairs(inventoryList) do
-        if self:IsCaneItem(item) then
+    -- 筛选优先级
+    local gameEquipmentList = self:AcceleraEquipFinalSort(inventoryList)
+
+    -- 最终装备
+    for _, item in pairs(gameEquipmentList) do
             SendRPCToServer(RPC.EquipActionItem, item)
             return
-        end
     end
 end
 
