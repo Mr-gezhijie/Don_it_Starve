@@ -101,8 +101,8 @@ function Autoswitch:OnUpdate(dt)
     local handItem = ThePlayer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
     if self:IsAttacking() then
         -- 装备武器
-        self:TryEquipWeaponItem()
-    elseif not self:IsCaneItem(handItem) and self:IsMoving() then
+        self:TryEquipWeaponItem()  -- 铥矿棒也得切换
+    elseif  self:IsMoving() and (handItem.prefab == "ruins_bat" or not self:IsCaneItem(handItem))  then
         -- 手里不是手杖，并且在移动，
         self:TryEquipCaneItem()
     end
