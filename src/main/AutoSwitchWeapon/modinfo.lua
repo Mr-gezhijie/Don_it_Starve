@@ -56,7 +56,7 @@ Welcome to leave a message for discussion!
 ]]
 
 author = "GEZHIJIE"
-version = "1.2.1"
+version = "1.2.2"
 
 forumthread = ""
 
@@ -370,4 +370,50 @@ configuration_options = {
         },
         default = true,
     },
+    {
+        name = "staff_lunarplant",
+        label = CHS and "亮茄魔杖" or "staff_lunarplant",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+    {
+        name = "houndstooth_blowpipe",
+        label = CHS and "嚎炮弹" or "houndstooth_blowpipe",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+    {
+        name = "bomb_lunarplant",
+        label = CHS and "亮茄炸弹" or "bomb_lunarplant",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+    {
+        name = "shovel_lunarplant",
+        label = CHS and "亮茄锄铲" or "shovel_lunarplant",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+    {
+        name = "pickaxe_lunarplant",
+        label = CHS and "亮茄粉碎者" or "pickaxe_lunarplant",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = false,
+    },
+
 }

@@ -56,6 +56,12 @@ local TOOL_LIST = {
     balloonspeed = GetModConfigData("balloonspeed"), -- 迅捷气球
     moonglassaxe = GetModConfigData("moonglassaxe"), -- 月光玻璃斧
     multitool_axe_pickaxe = GetModConfigData("multitool_axe_pickaxe"), -- 多用斧稿
+    staff_lunarplant = GetModConfigData("staff_lunarplant"), -- 亮茄魔杖
+    houndstooth_blowpipe = GetModConfigData("houndstooth_blowpipe"), -- 嚎炮弹
+    bomb_lunarplant = GetModConfigData("bomb_lunarplant"), -- 亮茄炸弹
+    shovel_lunarplant = GetModConfigData("shovel_lunarplant"), -- 亮茄锄铲
+    pickaxe_lunarplant = GetModConfigData("pickaxe_lunarplant"), -- 亮茄粉碎者
+
 }
 
 

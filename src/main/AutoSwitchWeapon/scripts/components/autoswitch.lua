@@ -29,12 +29,14 @@ function Autoswitch:SwitchSpinning()
         return
     end
     if self.isSpinning then
+        -- 禁用
         ChatHistory:AddToHistory(ChatTypes.Message, nil, nil, ability_x, disable_x, PLAYERCOLOURS.CORAL)
         -- ChatHistory:SendCommandResponse('自动切手杖:关闭')
         self.inst:StopUpdatingComponent(self)
         self.isSpinning = false
         self:IconHide()
     else
+        -- 启用
         ChatHistory:AddToHistory(ChatTypes.Message, nil, nil, ability_x, enable_x, PLAYERCOLOURS.CORAL)
         -- ChatHistory:SendCommandResponse('自动切手杖:启动')
         self.inst:StartUpdatingComponent(self)
@@ -67,10 +69,12 @@ function Autoswitch:IconHide()
     end
 end
 
+-- 组件缓存用途
 function Autoswitch:GetCachedItem(item)
     return CacheService:GetCachedItem(item)
 end
 
+-- 获取步行速度？
 function Autoswitch:GetWalkspeedMult(item)
     local cachedItem = self:GetCachedItem(item)
     return cachedItem
@@ -82,12 +86,15 @@ end
 function Autoswitch:OnUpdate(dt)
     local handItem = ThePlayer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
     if self:IsAttacking() then
+        -- 装备武器
         self:TryEquipWeaponItem()
     elseif not self:IsCaneItem(handItem) and self:IsMoving() then
+        -- 手里不是手杖，并且在移动，
         self:TryEquipCaneItem()
     end
 end
 
+-- 检查是否为武器
 function Autoswitch:IsWeaponItem(item)
     return item and item:HasTag("weapon") and
             not (item.prefab == "cane" or item.prefab == "orangestaff")
@@ -118,6 +125,7 @@ function Autoswitch:CalcRange(weapon)
     return 3 + ((weapon and self.weaponList[weapon.prefab]) or 1)
 end
 
+-- 按下攻击后，判断是否可攻击
 function Autoswitch:IsAttacking()
     if TheSim:GetDigitalControl(CONTROL_ATTACK) or TheSim:GetDigitalControl(CONTROL_CONTROLLER_ATTACK) or TheSim:GetDigitalControl(CONTROL_MENU_MISC_1) then
         local x, y, z = ThePlayer:GetPosition():Get()
@@ -130,6 +138,7 @@ function Autoswitch:IsAttacking()
     end
 end
 
+-- 装备武器
 function Autoswitch:TryEquipWeaponItem()
     local item = ThePlayer.replica.inventory:GetItemInSlot(self.chipSlot)
     if self:IsWeaponItem(item) then
