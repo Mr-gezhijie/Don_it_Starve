@@ -24,13 +24,14 @@ end)
 local CHS = true
 
 function Autoswitch:SetWeaponList(weaponList) self.weaponList = weaponList end
-function Autoswitch:SetWeaponList(toolList) self.toolList = toolList end
+function Autoswitch:SetToollList(toolList) self.toolList = toolList end
 function Autoswitch:IsAutoActivation(isSpinning) self.isSpinning = isSpinning end
-function Autoswitch:IsAutoActivation(language) CHS = language end
+function Autoswitch:IsLanguage(language) CHS = language end
 function Autoswitch:SetchipSlot(num) self.chipSlot = num end
 
 function Autoswitch:IsInGame()
-    return ThePlayer ~= nil and TheFrontEnd:GetActiveScreen().name == "HUD"
+    --return ThePlayer ~= nil and TheFrontEnd:GetActiveScreen().name == "HUD"
+    return not (TheFrontEnd:GetActiveScreen().name:find("HUD") ~= nil and not (ThePlayer.HUD:IsControllerCraftingOpen() or ThePlayer.HUD:IsControllerInventoryOpen()))
 end
 
 local ability_x = CHS and "自动切手杖" or "Automatic cutting cane"
@@ -39,7 +40,8 @@ local disable_x = CHS and "禁用" or "Disable"
 
 -- 按键入口
 function Autoswitch:SwitchSpinning()
-    if not Autoswitch:IsInGame() then
+    --if not Autoswitch:IsInGame() then
+    if Autoswitch:IsInGame() then
         return
     end
     if self.isSpinning then
@@ -98,13 +100,18 @@ function Autoswitch:GetWalkspeedMult(item)
 end
 
 function Autoswitch:OnUpdate(dt)
-    local handItem = ThePlayer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
-    if self:IsAttacking() then
-        -- 装备武器
-        self:TryEquipWeaponItem()  -- 铥矿棒也得切换
-    elseif  self:IsMoving() and ( (handItem and handItem.prefab == "ruins_bat" ) or not self:IsCaneItem(handItem))  then
-        -- 手里不是手杖，并且在移动，
-        self:TryEquipCaneItem()
+    -- 如果在聊天，或者，在骑牛，我们就什么也不做
+    if not (ThePlayer.replica.rider.classified ~= nil and ThePlayer.replica.rider.classified.ridermount:value()) then
+        if not self:IsInGame() then
+            local handItem = ThePlayer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+            if self:IsAttacking() then
+                -- 装备武器
+                self:TryEquipWeaponItem()  -- 铥矿棒也得切换
+            elseif  self:IsMoving() and ( (handItem and handItem.prefab == "ruins_bat" ) or not self:IsCaneItem(handItem))  then
+                -- 手里不是手杖，并且在移动，
+                self:TryEquipCaneItem()
+            end
+        end
     end
 end
 
@@ -135,6 +142,7 @@ function Autoswitch:IsMoving()
             TheSim:GetDigitalControl(CONTROL_MOVE_UP)
 end
 
+-- 设置攻击距离的
 function Autoswitch:CalcRange(weapon)
     return 3 + ((weapon and self.weaponList[weapon.prefab]) or 1)
 end
@@ -156,11 +164,8 @@ end
 function Autoswitch:AcceleraEquipSort(sortedItems,inventoryList)
     -- 先加速物品
     for prefab, key in pairs(self.allowedArr) do
-        print("ceshiaaaaa",key)
         for i, itemPrefab in ipairs(inventoryList) do
-            print("ceshibbbbbb",itemPrefab.prefab)
             if itemPrefab.prefab == key then
-                print("ceshicccccc","添加了",inventoryList[i])
                 table.insert(sortedItems, inventoryList[i])
                 table.remove(inventoryList, i)
                 break
@@ -199,7 +204,7 @@ function Autoswitch:TryEquipWeaponItem()
 end
 
 function Autoswitch:TryEquipCaneItem()
-    -- 不知道因为什么，反之这个获取的是无序的
+    -- 不知道因为什么，反正这个获取的是无序的
     local inventoryList = ThePlayer.replica.inventory:GetItems()
 
     local handItem = ThePlayer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
