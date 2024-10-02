@@ -93,10 +93,15 @@ end
 -- 获取步行速度？
 function Autoswitch:GetWalkspeedMult(item)
     local cachedItem = self:GetCachedItem(item)
-    return cachedItem
+    if cachedItem
             and cachedItem.components.equippable
-            and cachedItem.components.equippable.walkspeedmult
-            or 0
+            and cachedItem.components.equippable.walkspeedmult then
+        return cachedItem.components.equippable.walkspeedmult
+    elseif item and self.allowedMap[item.prefab] then
+        return 2 -- 只要大于1就行
+    else
+        return 0
+    end
 end
 
 function Autoswitch:OnUpdate(dt)
