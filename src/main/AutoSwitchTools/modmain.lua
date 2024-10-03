@@ -1211,9 +1211,9 @@ local function spaceKeyTriggersOperation()
             if tool and ENT_util:FnOrNum(worktable.equiptool, tool) then
                 SendRPCToServer(RPC.ControllerUseItemOnSelfFromInvTile, ACTIONS.EQUIP.code, tool)
             end
-            if worktable.oncontrolfn then
-                worktable.oncontrolfn({ item = tool, target = physicalObject })
-            end
+            --if worktable.oncontrolfn then
+            --    worktable.oncontrolfn({ item = tool, target = physicalObject })
+            --end
             if worktable.needreturn then
                 return
             end
