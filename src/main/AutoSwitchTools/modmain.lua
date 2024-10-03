@@ -992,7 +992,7 @@ end
 
 -- 我的函数
 local TARGET_EXCLUDE_TAGS = { "FX", "NOCLICK", "DECOR", "INLIMBO" }
-local TARGET_CONTAIN_TAGS = { "CHOP_workable", "MINE_workable" }
+local TARGET_CONTAIN_TAGS = { "CHOP_workable", "MINE_workable","NET_workable" }
 local function queryVicinity()
     -- 附近有树才会操作的选项
     if ThePlayer and ThePlayer.Transform then
@@ -1066,7 +1066,7 @@ local function queryVicinity()
 
             local pos2 =  Vector3(target_x,0,target_z)
             -- 查询我的坐标 附近的其他物品
-            local excludeLabelItems = { "FX", "NOCLICK", "DECOR", "INLIMBO", "CHOP_workable", "MINE_workable" }
+            local excludeLabelItems = { "FX", "NOCLICK", "DECOR", "INLIMBO", "CHOP_workable", "MINE_workable" ,"NET_workable" }
             local contieneLabelItems = { "pickable","_inventoryitem"}
             local ent_x = TheSim:FindEntities(xx, yy, zz, 6, nil, excludeLabelItems,contieneLabelItems)[1]
 
