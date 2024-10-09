@@ -51,20 +51,7 @@ function CacheService:GetCachedItem(item)
     end
 
     if not Cache[item.prefab] then
-        local sim = TheWorld.ismastersim
-        TheWorld.ismastersim = true
-
-        local status, err = pcall(SpawnPrefab, item.prefab)
-        if status then
-            local clone = SpawnPrefab(item.prefab)
-            Cache[item.prefab] = CacheItem(clone)
-            clone:Remove()
-            TheWorld.ismastersim = sim
-        else
             Cache[item.prefab] = CacheItem(item)
-            TheWorld.ismastersim = sim
-        end
-
     end
 
     return Cache[item.prefab]
