@@ -438,6 +438,24 @@ local tagtable = {
         end,
         needoncontrol = true
     },
+    ['HACK_workable'] = {
+        action = ACTIONS.MINE,
+        tooltag = 'HACK_tool',
+        equiptool = true,
+        isleftclick = true,
+        selectfn = function(ent)
+            if INV_util:FindInInventory(nil, 'HACK_tool') then
+                return true
+            end
+        end,
+        fallfn = function(action)
+            if action and action.action and (action.action.id == 'HACK' or ClickEquip.blacklist_lmb[action.action.id]) then
+                return true
+            end
+            return false
+        end,
+        needoncontrol = true
+    },
     ['DIG_workable'] = {
         action = ACTIONS.DIG,
         tooltag = 'DIG_tool',
@@ -992,7 +1010,7 @@ end
 
 -- 我的函数
 local TARGET_EXCLUDE_TAGS = { "FX", "NOCLICK", "DECOR", "INLIMBO" }
-local TARGET_CONTAIN_TAGS = { "CHOP_workable", "MINE_workable","NET_workable" }
+local TARGET_CONTAIN_TAGS = { "CHOP_workable", "MINE_workable","NET_workable","HACK_workable" }
 local function queryVicinity()
     -- 附近有树才会操作的选项
     if ThePlayer and ThePlayer.Transform then
@@ -1002,7 +1020,9 @@ local function queryVicinity()
         local ent2 = FindEntity(ThePlayer, 6, nil, nil, TARGET_EXCLUDE_TAGS,TARGET_CONTAIN_TAGS)
         -- 附近有树了，我才会走
 
-        if ent2 and ent2.prefab ~= "twiggytree" and ent2.prefab ~= "statueglommer" then
+        if ent2 and ent2.prefab ~= "twiggytree"
+                and ent2.prefab ~= "statueglommer"
+                and ent2.prefab ~= "coconut" then -- 不等于椰果（海难的）
             -- 计算坐标偏差
             local x,y,z =  ent2.Transform:GetWorldPosition()
             local offset = 0.5
@@ -1060,13 +1080,19 @@ local function queryVicinity()
                 offset = 0.8
             end
 
+            -- 砍刀
+            if ent2:HasTag("HACK_workable") then
+                offset = 0.8
+            end
+
+
             -- 计算最终应该走到哪个地方--排除碰撞体积
             local target_x = x + offset * (xx - x > 0 and 1 or -1)
             local target_z = z + offset * (zz - z > 0 and 1 or -1)
 
             local pos2 =  Vector3(target_x,0,target_z)
             -- 查询我的坐标 附近的其他物品
-            local excludeLabelItems = { "FX", "NOCLICK", "DECOR", "INLIMBO", "CHOP_workable", "MINE_workable" ,"NET_workable" }
+            local excludeLabelItems = { "FX", "NOCLICK", "DECOR", "INLIMBO", "CHOP_workable", "MINE_workable" ,"NET_workable","HACK_workable" }
             local contieneLabelItems = { "pickable","_inventoryitem"}
             local ent_x = TheSim:FindEntities(xx, yy, zz, 6, nil, excludeLabelItems,contieneLabelItems)[1]
 

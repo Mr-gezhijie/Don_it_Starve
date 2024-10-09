@@ -45,7 +45,7 @@ shipwrecked_compatible = false
 icon_atlas = "modicon.xml"
 icon = "modicon.tex"
 
-version = "1.1.6"
+version = "1.1.7"
 server_filter_tags = {}
 local null_options = {
 	{ description = "", data = "" }
