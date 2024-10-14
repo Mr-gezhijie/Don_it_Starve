@@ -1076,6 +1076,7 @@ local function queryVicinity()
             elseif ent2:HasTag("CHOP_workable") and (
                     ent2.prefab == "toadstool_cap"
                             or ent2.prefab == "toadstool_cap_dark"
+                    or ent2.prefab == "palmconetree" -- 棕榈树
             ) then
                 offset = 0.8
             end
