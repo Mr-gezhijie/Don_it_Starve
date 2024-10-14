@@ -24,6 +24,7 @@ local WEAPON_LIST = {
     pocketwatch_weapon = TUNING.WHIP_RANGE,
     whip = TUNING.WHIP_RANGE,
     bullkelp_root = TUNING.BULLKELP_ROOT_RANGE,
+    danzhu_staff = 10,  -- 孤岛抽奖，弹珠法杖
 }
 
 -- 不切换手杖的物品列表
