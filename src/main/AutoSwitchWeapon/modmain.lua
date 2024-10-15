@@ -11,19 +11,26 @@ Assets = {
 }
 
 local WEAPON_LIST = {
-    blowdart_fire = 8,
-    blowdart_sleep = 8,
-    blowdart_pipe = 8,
-    blowdart_yellow = 8,
-    blowdart_walrus = 8,
-    firestaff = 8,
-    icestaff = 8,
+    blowdart_fire = 8, -- 吹箭-火
+    blowdart_sleep = 8, -- 吹箭-催眠
+    blowdart_pipe = 8, -- 吹箭
+    blowdart_yellow = 8, -- 吹箭-雷电
+    blowdart_walrus = 8, -- 吹箭-海象？？？？？
+    firestaff = 8, -- 火魔杖
+    icestaff = 8, -- 冰魔杖
     firepen = 8,
-    houndstooth_blowpipe = 12,
-    staff_lunarplant = 8,
-    pocketwatch_weapon = TUNING.WHIP_RANGE,
-    whip = TUNING.WHIP_RANGE,
-    bullkelp_root = TUNING.BULLKELP_ROOT_RANGE,
+    houndstooth_blowpipe = 12, -- 狗牙吹箭
+    staff_lunarplant = 8, -- 亮茄魔杖
+    pocketwatch_weapon = TUNING.WHIP_RANGE, -- 怀表武器范围
+    whip = TUNING.WHIP_RANGE, -- 鞭子
+    bullkelp_root = TUNING.BULLKELP_ROOT_RANGE, -- 海带根
+
+    voidcloth_boomerang = 10, -- 阴郁回旋镖
+    boomerang =12, -- 回旋镖
+    slingshot = 10, -- 可靠的弹弓 --角色专属的
+    bomb_lunarplant = 8, --亮茄炸弹
+
+    -- mod
     danzhu_staff = 10,  -- 孤岛抽奖，弹珠法杖
 }
 

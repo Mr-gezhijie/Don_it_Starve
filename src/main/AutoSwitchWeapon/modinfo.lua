@@ -56,7 +56,7 @@ Welcome to leave a message for discussion!
 ]]
 
 author = "GEZHIJIE"
-version = "1.2.9"
+version = "1.3.0"
 
 forumthread = ""
 
