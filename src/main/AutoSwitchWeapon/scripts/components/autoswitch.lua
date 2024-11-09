@@ -157,8 +157,11 @@ function Autoswitch:IsAttacking()
     if TheSim:GetDigitalControl(CONTROL_ATTACK) or TheSim:GetDigitalControl(CONTROL_CONTROLLER_ATTACK) or TheSim:GetDigitalControl(CONTROL_MENU_MISC_1) then
         local x, y, z = ThePlayer:GetPosition():Get()
         local weapon = ThePlayer.replica.inventory:GetItemInSlot(self.chipSlot)
+        --return next(TheSim:FindEntities(x, y, z, self:CalcRange(weapon), nil, {
+        --    "abigail", "player", "structure", "wall"
+        --}, { "_combat", "hostile" }))
         return next(TheSim:FindEntities(x, y, z, self:CalcRange(weapon), nil, {
-            "abigail", "player", "structure", "wall"
+            "abigail", "player", "wall"
         }, { "_combat", "hostile" }))
     else
         return false
