@@ -84,6 +84,7 @@ local TOOL_LIST = {
     balloon = GetModConfigData("balloon"), -- 气球
     balloonparty = GetModConfigData("balloonparty"), -- 派对气球
     balloonspeed = GetModConfigData("balloonspeed"), -- 迅捷气球
+    winona_telebrella = GetModConfigData("winona_telebrella"), -- 女工-传送伞
 
 }
 
