@@ -5,7 +5,11 @@
 
 local GLOBAL = GLOBAL;
 local pcall = GLOBAL.pcall
+
+local RPC = GLOBAL.RPC
+local ACTIONS = GLOBAL.ACTIONS
 local EQUIPSLOTS = GLOBAL.EQUIPSLOTS
+local SendRPCToServer = GLOBAL.SendRPCToServer
 local TheInput = GLOBAL.TheInput
 local AllRecipes = GLOBAL.AllRecipes
 local GetTime = GLOBAL.GetTime
@@ -112,7 +116,8 @@ local function DoUnequip(inst)
     if (inst and inst.replica and inst.replica.inventory) then
         hasEquipped = false;
         local handEquipment =  GetEquippedItem(inst,EQUIPSLOTS.HANDS)
-        if handEquipment and IsCheckIfLighting(handEquipment) then
+        --// 判断手中的东西，如果是火女的武器，就不卸下
+        if handEquipment and IsCheckIfLighting(handEquipment) and handEquipment.prefab ~= "lighter" then
             inst.replica.inventory:UseItemFromInvTile(handEquipment)
         end
     end

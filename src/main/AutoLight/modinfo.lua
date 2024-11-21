@@ -69,7 +69,7 @@ Welcome to leave a message for discussion!
 ]]
 
 author = "GEZHIJIE"
-version = "2.0.1"
+version = "2.0.2"
 forumthread = ""
 api_version_dst = 10
 icon_atlas = "modicon.xml"  -- logo地址
