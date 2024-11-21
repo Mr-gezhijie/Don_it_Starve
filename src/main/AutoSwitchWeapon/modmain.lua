@@ -2,6 +2,7 @@ local KEY_SWITCH = GLOBAL["KEY_" .. GetModConfigData("KEY_SWITCH")]
 local CHIP_SLOT = GLOBAL.tonumber(GetModConfigData("CHIP_SLOT"))
 local IS_ACTIVATION = not GetModConfigData("isActivation")
 local LANGUAGE = not GetModConfigData("Language")
+local strangeAttacks = GetModConfigData("strangeAttacks") -- 奇怪的攻击
 
 Assets = {
     Asset("IMAGE", "images/icon-autoswitch-hide.tex"),
@@ -95,6 +96,13 @@ local TOOL_LIST = {
     balloonspeed = GetModConfigData("balloonspeed"), -- 迅捷气球
     winona_telebrella = GetModConfigData("winona_telebrella"), -- 女工-传送伞
 
+    -- mod
+    -- 熔炉
+    forgedarts = GetModConfigData("forgedarts"), -- 吹箭
+    moltendarts = GetModConfigData("moltendarts"), -- 融化吹箭
+    livingstaff = GetModConfigData("livingstaff"), -- 生命魔杖
+    infernalstaff = GetModConfigData("infernalstaff"), -- 地狱魔杖
+
 }
 
 
@@ -107,6 +115,7 @@ AddPrefabPostInit("player_classified", function(inst)
             GLOBAL.ThePlayer.components.autoswitch:SetToollList(TOOL_LIST)
             GLOBAL.ThePlayer.components.autoswitch:IsAutoActivation(IS_ACTIVATION)
             GLOBAL.ThePlayer.components.autoswitch:IsLanguage(LANGUAGE)
+            GLOBAL.ThePlayer.components.autoswitch:IsStrangeAttacks(strangeAttacks)
             GLOBAL.ThePlayer.components.autoswitch:SwitchSpinning()
         end
     end)

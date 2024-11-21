@@ -6,6 +6,7 @@ local Autoswitch = Class(function(self, inst)
     self.isSpinning = false -- false是启用，true是关闭
     self.weaponList = {}
     self.toolList = {}
+    self.isStrangeAttacks= false
     self.allowedMap = {
         ["orangestaff"] = true, -- 懒人手杖
         ["cane"] = true, -- 步行手杖
@@ -27,6 +28,7 @@ function Autoswitch:SetWeaponList(weaponList) self.weaponList = weaponList end
 function Autoswitch:SetToollList(toolList) self.toolList = toolList end
 function Autoswitch:IsAutoActivation(isSpinning) self.isSpinning = isSpinning end
 function Autoswitch:IsLanguage(language) CHS = language end
+function Autoswitch:IsStrangeAttacks(strangeAttacks) self.isStrangeAttacks = strangeAttacks end
 function Autoswitch:SetchipSlot(num) self.chipSlot = num end
 
 function Autoswitch:IsInGame()
@@ -154,15 +156,26 @@ end
 
 -- 按下攻击后，判断是否可攻击
 function Autoswitch:IsAttacking()
-    if TheSim:GetDigitalControl(CONTROL_ATTACK) or TheSim:GetDigitalControl(CONTROL_CONTROLLER_ATTACK) or TheSim:GetDigitalControl(CONTROL_MENU_MISC_1) then
+    if TheSim:GetDigitalControl(CONTROL_ATTACK) or TheSim:GetDigitalControl(CONTROL_CONTROLLER_ATTACK) or TheSim:GetDigitalControl(CONTROL_MENU_MISC_1) or  TheInput:IsControlPressed(CONTROL_FORCE_ATTACK) then
         local x, y, z = ThePlayer:GetPosition():Get()
         local weapon = ThePlayer.replica.inventory:GetItemInSlot(self.chipSlot)
         --return next(TheSim:FindEntities(x, y, z, self:CalcRange(weapon), nil, {
         --    "abigail", "player", "structure", "wall"
         --}, { "_combat", "hostile" }))
-        return next(TheSim:FindEntities(x, y, z, self:CalcRange(weapon), nil, {
-            "abigail", "player", "wall"
-        }, { "_combat", "hostile" }))
+        --•	"abigail"：可能是玩家的阿比盖尔角色。
+        --•	"player"：排除玩家角色。
+        --•	"structure"：忽略建筑类实体。
+        --•	"wall"：忽略墙体或障碍物。
+
+        if  self.isStrangeAttacks then
+            return next(TheSim:FindEntities(x, y, z, self:CalcRange(weapon), nil, {
+                "abigail", "wall"
+            }, { "_combat", "hostile" }))
+        else
+            return next(TheSim:FindEntities(x, y, z, self:CalcRange(weapon), nil, {
+                "abigail","player","wall"
+            }, { "_combat", "hostile" }))
+        end
     else
         return false
     end
@@ -208,6 +221,7 @@ function Autoswitch:TryEquipWeaponItem()
     local item = ThePlayer.replica.inventory:GetItemInSlot(self.chipSlot)
     if self:IsWeaponItem(item) then
         SendRPCToServer(RPC.EquipActionItem, item)
+        --ThePlayer.replica.inventory:UseItemFromInvTile(item)
     end
 end
 

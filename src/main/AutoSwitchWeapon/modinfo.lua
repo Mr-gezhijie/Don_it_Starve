@@ -56,7 +56,7 @@ Welcome to leave a message for discussion!
 ]]
 
 author = "GEZHIJIE"
-version = "1.3.3"
+version = "1.3.7"
 
 forumthread = ""
 
@@ -121,6 +121,15 @@ configuration_options = {
         hover = CHS and "会在物品栏上出现一个标记" or "A mark will appear on the inventory list",
         options = SLOT_OPTIONS,
         default = "15"
+    },
+    {
+        name = "strangeAttacks",
+        label = CHS and "奇怪的攻击" or "strangeAttacks",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "不开启，奇怪的攻击，默认这样更好" or "Not turned on, strange attack, default is better this way" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不建议开启，因为这个不适用普通玩家" or "Not recommended to enable as it is not suitable for regular players" }
+        },
+        default = false,
     },
     {
         name = "x1",
@@ -505,5 +514,58 @@ configuration_options = {
         },
         default = true,
     },
+
+
+
+
+
+    -- -------------------------------------------------------------------- mod ------------------------------------------
+    -- 熔炉
+    {
+        name = "x2",
+        label = CHS and "mod-以下物品不切换-熔炉" or "mod-Follow items do not switch-furnace",
+        options = { {
+                        description = "",
+                        data = ""
+                    } },
+        default = ""
+    },
+    {
+        name = "forgedarts",
+        label = CHS and "吹箭" or "forgedarts",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+    {
+        name = "moltendarts",
+        label = CHS and "融化吹箭" or "moltendarts",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+    {
+        name = "livingstaff",
+        label = CHS and "生命魔杖" or "livingstaff",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+    {
+        name = "infernalstaff",
+        label = CHS and "地狱魔杖" or "infernalstaff",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+
 
 }
