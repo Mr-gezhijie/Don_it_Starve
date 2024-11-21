@@ -31,7 +31,16 @@ local WEAPON_LIST = {
     bomb_lunarplant = 8, --亮茄炸弹
 
     -- mod
-    danzhu_staff = 10,  -- 孤岛抽奖，弹珠法杖
+    -- 孤岛抽奖
+    danzhu_staff = 10,  -- 弹珠法杖
+    -- 熔炉
+    forgedarts = 10, -- 吹箭
+    moltendarts = 10, -- 融化吹箭
+    livingstaff = 10, -- 生命魔杖
+    infernalstaff = 10, -- 地狱魔杖
+
+
+
 }
 
 -- 不切换手杖的物品列表
