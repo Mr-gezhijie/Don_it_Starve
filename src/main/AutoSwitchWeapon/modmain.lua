@@ -64,7 +64,11 @@ local TOOL_LIST = {
     golden_farm_hoe = GetModConfigData("golden_farm_hoe"), -- 黄金园艺锄
     oar = GetModConfigData("oar"), -- 浆
     oar_driftwood = GetModConfigData("oar_driftwood"), -- 浮木浆
+    oar_monkey = GetModConfigData("oar_monkey"), -- 战桨
     malbatross_beak = GetModConfigData("malbatross_beak"), -- 邪天翁喙
+    yotd_oar = GetModConfigData("yotd_oar"), -- 利爪船桨
+
+
     oceanfishingrod = GetModConfigData("oceanfishingrod"), -- 海钓杆
     voidcloth_umbrella = GetModConfigData("voidcloth_umbrella"), -- 暗影伞
     voidcloth_scythe = GetModConfigData("voidcloth_scythe"), -- 暗影镰刀
