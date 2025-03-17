@@ -8,6 +8,7 @@ local Autoswitch = Class(function(self, inst)
     self.toolList = {}
     self.isStrangeAttacks= false
     self.allowedMap = {
+        ["fgc_book_emo"] = true, -- 恶魔契约手杖
         ["orangestaff"] = true, -- 懒人手杖
         ["cane"] = true, -- 步行手杖
         ["walking_stick"] = true,  -- 木手杖
@@ -15,6 +16,7 @@ local Autoswitch = Class(function(self, inst)
         ["balloonspeed"] = true, -- 敏捷气球
     }
     self.allowedArr = {
+        "fgc_book_emo", -- 恶魔契约手杖
         "orangestaff", -- 懒人手杖
         "cane", -- 步行手杖
         "walking_stick",  -- 木手杖
