@@ -56,7 +56,7 @@ Welcome to leave a message for discussion!
 ]]
 
 author = "GEZHIJIE"
-version = "1.3.9"
+version = "1.4.1"
 
 forumthread = ""
 
@@ -578,6 +578,27 @@ configuration_options = {
     {
         name = "infernalstaff",
         label = CHS and "地狱魔杖" or "infernalstaff",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+
+
+    -- -------------------------------------------------------------------- 奇怪要求 ------------------------------------------
+    {
+        name = "x3",
+        label = CHS and "奇怪的要求,以下物品不切换" or "Strange request, do not switch the following items",
+        options = { {
+                        description = "",
+                        data = ""
+                    } },
+        default = ""
+    },
+    {
+        name = "glasscutter",
+        label = CHS and "玻璃刀" or "glasscutter",
         options = {
             { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
             { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }

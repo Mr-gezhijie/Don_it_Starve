@@ -107,6 +107,10 @@ local TOOL_LIST = {
     livingstaff = GetModConfigData("livingstaff"), -- 生命魔杖
     infernalstaff = GetModConfigData("infernalstaff"), -- 地狱魔杖
 
+    -- 奇葩要求
+    glasscutter = GetModConfigData("glasscutter"), -- 玻璃刀
+
+
 }
 
 
