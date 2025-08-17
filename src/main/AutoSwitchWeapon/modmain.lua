@@ -80,6 +80,7 @@ local TOOL_LIST = {
     icestaff = GetModConfigData("fires_ice_staff"), -- 冰魔杖
     boomerang = GetModConfigData("boomerang"), -- 回旋镖
     spear_wathgrithr_lightning = GetModConfigData("spear_wathgrithr_lightning"), -- 奔雷矛
+    spear_wathgrithr_lightning_charged = GetModConfigData("spear_wathgrithr_lightning_charged"), -- 充能奔雷矛
     nightstick = GetModConfigData("nightstick"), -- 晨星锤
     blowdart_sleep = GetModConfigData("sleep_fire_yellow_blowdart"), -- 催眠吹箭
     blowdart_fire = GetModConfigData("sleep_fire_yellow_blowdart"), -- 火焰吹箭

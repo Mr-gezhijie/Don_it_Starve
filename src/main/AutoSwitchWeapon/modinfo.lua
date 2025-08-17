@@ -1,7 +1,7 @@
 local CHS = locale == "zh" or locale == "zhr"
 
 name = "AutoSwitchWeapon 自动切换武器"
--- name = "AAAA"
+--name = "AAAA"
 description = CHS and [[
 自动切换手杖和武器
 
@@ -56,7 +56,7 @@ Welcome to leave a message for discussion!
 ]]
 
 author = "GEZHIJIE"
-version = "1.4.1"
+version = "1.4.2"
 
 forumthread = ""
 
@@ -382,6 +382,15 @@ configuration_options = {
     {
         name = "spear_wathgrithr_lightning",
         label = CHS and "奔雷矛" or "spear_wathgrithr_lightning",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = true,
+    },
+    {
+        name = "spear_wathgrithr_lightning_charged",
+        label = CHS and "充能奔雷矛" or "spear_wathgrithr_lightning_charged",
         options = {
             { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
             { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
