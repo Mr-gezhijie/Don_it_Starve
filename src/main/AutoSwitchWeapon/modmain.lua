@@ -1,5 +1,6 @@
 local KEY_SWITCH = GLOBAL["KEY_" .. GetModConfigData("KEY_SWITCH")]
 local CHIP_SLOT = GLOBAL.tonumber(GetModConfigData("CHIP_SLOT"))
+local CHIP_SLOT_SHOW_ICON = GetModConfigData("CHIP_SLOT_SHOW_ICON")
 local IS_ACTIVATION = not GetModConfigData("isActivation")
 local LANGUAGE = not GetModConfigData("Language")
 local strangeAttacks = GetModConfigData("strangeAttacks") -- 奇怪的攻击
@@ -53,6 +54,7 @@ local TOOL_LIST = {
     -- 我新加入的
     lighter = GetModConfigData("lighter"), -- 薇洛的打火机
     reskin_tool = GetModConfigData("reskin_tool"), -- 清洁扫把
+    hammer = GetModConfigData("hammer"), -- 锤子
     bugnet = GetModConfigData("bugnet"), -- 捕虫网
     shovel = GetModConfigData("shovel"), -- 铲子
     goldenshovel = GetModConfigData("goldenshovel"), -- 黄金铲子
@@ -120,12 +122,13 @@ AddPrefabPostInit("player_classified", function(inst)
         if GLOBAL.ThePlayer then
             GLOBAL.ThePlayer:AddComponent("autoswitch")
             GLOBAL.ThePlayer.components.autoswitch:SetchipSlot(CHIP_SLOT)
+            GLOBAL.ThePlayer.components.autoswitch:SetShowIcon(CHIP_SLOT_SHOW_ICON)
             GLOBAL.ThePlayer.components.autoswitch:SetWeaponList(WEAPON_LIST)
             GLOBAL.ThePlayer.components.autoswitch:SetToollList(TOOL_LIST)
             GLOBAL.ThePlayer.components.autoswitch:IsAutoActivation(IS_ACTIVATION)
             GLOBAL.ThePlayer.components.autoswitch:IsLanguage(LANGUAGE)
             GLOBAL.ThePlayer.components.autoswitch:IsStrangeAttacks(strangeAttacks)
-            GLOBAL.ThePlayer.components.autoswitch:SwitchSpinning()
+            GLOBAL.ThePlayer.components.autoswitch:SwitchSpinning(true)  -- 改:加true,静默初始化
         end
     end)
 end)

@@ -56,7 +56,7 @@ Welcome to leave a message for discussion!
 ]]
 
 author = "GEZHIJIE"
-version = "1.4.2"
+version = "1.4.3"
 
 forumthread = ""
 
@@ -121,6 +121,15 @@ configuration_options = {
         hover = CHS and "会在物品栏上出现一个标记" or "A mark will appear on the inventory list",
         options = SLOT_OPTIONS,
         default = "15"
+    },
+    {
+        name = "CHIP_SLOT_SHOW_ICON",
+        label = CHS and "待切换武器槽位-显示图标" or "Weapon slot to be switched - Display icon",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "不会显示图标" or "Will not display icon" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "会显示图标" or "Icon will be displayed" }
+        },
+        default = true,
     },
     {
         name = "strangeAttacks",
@@ -189,6 +198,15 @@ configuration_options = {
             { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
         },
         default = true,
+    },
+    {
+        name = "hammer",
+        label = CHS and "锤子" or "hammer",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = false,
     },
     {
         name = "bugnet",

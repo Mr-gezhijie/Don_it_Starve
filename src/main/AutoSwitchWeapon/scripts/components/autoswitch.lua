@@ -4,6 +4,7 @@ local Autoswitch = Class(function(self, inst)
     self.inst = inst
     self.chipSlot = 15
     self.isSpinning = false -- false是启用，true是关闭
+    self.showIcon = true
     self.weaponList = {}
     self.toolList = {}
     self.isStrangeAttacks= false
@@ -34,6 +35,7 @@ function Autoswitch:IsAutoActivation(isSpinning) self.isSpinning = isSpinning en
 function Autoswitch:IsLanguage(language) CHS = language end
 function Autoswitch:IsStrangeAttacks(strangeAttacks) self.isStrangeAttacks = strangeAttacks end
 function Autoswitch:SetchipSlot(num) self.chipSlot = num end
+function Autoswitch:SetShowIcon(showIcon) self.showIcon = showIcon end
 
 function Autoswitch:IsInGame()
     --return ThePlayer ~= nil and TheFrontEnd:GetActiveScreen().name == "HUD"
@@ -45,21 +47,25 @@ local enable_x = CHS and "启用" or "Enable"
 local disable_x = CHS and "禁用" or "Disable"
 
 -- 按键入口
-function Autoswitch:SwitchSpinning()
+function Autoswitch:SwitchSpinning(silent)
     --if not Autoswitch:IsInGame() then
     if Autoswitch:IsInGame() then
         return
     end
     if self.isSpinning then
         -- 禁用
-        ChatHistory:AddToHistory(ChatTypes.Message, nil, nil, ability_x, disable_x, PLAYERCOLOURS.GREEN)
+        if not silent then  -- 只在非静默模式下显示提示
+            ChatHistory:AddToHistory(ChatTypes.Message, nil, nil, ability_x, disable_x, PLAYERCOLOURS.GREEN)
+        end
         -- ChatHistory:SendCommandResponse('自动切手杖:关闭')
         self.inst:StopUpdatingComponent(self)
         self.isSpinning = false
         self:IconHide()
     else
         -- 启用
-        ChatHistory:AddToHistory(ChatTypes.Message, nil, nil, ability_x, enable_x, PLAYERCOLOURS.GREEN)
+        if not silent then  -- 只在非静默模式下显示提示
+            ChatHistory:AddToHistory(ChatTypes.Message, nil, nil, ability_x, enable_x, PLAYERCOLOURS.GREEN)
+        end
         -- ChatHistory:SendCommandResponse('自动切手杖:启动')
         self.inst:StartUpdatingComponent(self)
         self.isSpinning = true
@@ -68,6 +74,9 @@ function Autoswitch:SwitchSpinning()
 end
 
 function Autoswitch:IconHint()
+    if not self.showIcon then  -- 添加这个判断
+        return
+    end
     if ThePlayer and ThePlayer.HUD and ThePlayer.HUD.controls and
             ThePlayer.HUD.controls.inv and ThePlayer.HUD.controls.inv.inv and
             ThePlayer.HUD.controls.inv.inv[self.chipSlot] then
@@ -80,6 +89,9 @@ function Autoswitch:IconHint()
 end
 
 function Autoswitch:IconHide()
+    if not self.showIcon then  -- 添加这个判断
+        return
+    end
     if ThePlayer and ThePlayer.HUD and ThePlayer.HUD.controls and
             ThePlayer.HUD.controls.inv and ThePlayer.HUD.controls.inv.inv and
             ThePlayer.HUD.controls.inv.inv[self.chipSlot] then
