@@ -56,7 +56,7 @@ Welcome to leave a message for discussion!
 ]]
 
 author = "GEZHIJIE"
-version = "1.4.3"
+version = "1.4.4"
 
 forumthread = ""
 
@@ -202,6 +202,42 @@ configuration_options = {
     {
         name = "hammer",
         label = CHS and "锤子" or "hammer",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = false,
+    },
+    {
+        name = "axe",
+        label = CHS and "斧头" or "axe",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = false,
+    },
+    {
+        name = "goldenaxe",
+        label = CHS and "黄金斧头" or "goldenaxe",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = false,
+    },
+    {
+        name = "pickaxe",
+        label = CHS and "鹤嘴锄" or "pickaxe",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = false,
+    },
+    {
+        name = "goldenpickaxe",
+        label = CHS and "黄金鹤嘴锄" or "goldenpickaxe",
         options = {
             { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
             { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
@@ -558,6 +594,15 @@ configuration_options = {
             { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
         },
         default = true,
+    },
+    {
+        name = "wathgrithr_shield",
+        label = CHS and "女武士-战斗圆盾" or "wathgrithr_shield",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = false,
     },
 
 

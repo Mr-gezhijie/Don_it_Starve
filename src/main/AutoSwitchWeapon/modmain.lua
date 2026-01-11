@@ -55,6 +55,10 @@ local TOOL_LIST = {
     lighter = GetModConfigData("lighter"), -- 薇洛的打火机
     reskin_tool = GetModConfigData("reskin_tool"), -- 清洁扫把
     hammer = GetModConfigData("hammer"), -- 锤子
+    axe = GetModConfigData("axe"), -- 斧头
+    goldenaxe = GetModConfigData("goldenaxe"), -- 黄金斧头
+    pickaxe = GetModConfigData("pickaxe"), -- 鹤嘴锄
+    goldenpickaxe = GetModConfigData("goldenpickaxe"), -- 黄金鹤嘴锄
     bugnet = GetModConfigData("bugnet"), -- 捕虫网
     shovel = GetModConfigData("shovel"), -- 铲子
     goldenshovel = GetModConfigData("goldenshovel"), -- 黄金铲子
@@ -102,6 +106,7 @@ local TOOL_LIST = {
     balloonparty = GetModConfigData("balloonparty"), -- 派对气球
     balloonspeed = GetModConfigData("balloonspeed"), -- 迅捷气球
     winona_telebrella = GetModConfigData("winona_telebrella"), -- 女工-传送伞
+    wathgrithr_shield = GetModConfigData("wathgrithr_shield"), -- 女武士-战斗圆盾
 
     -- mod
     -- 熔炉
