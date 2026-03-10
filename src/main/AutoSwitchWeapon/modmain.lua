@@ -41,6 +41,9 @@ local WEAPON_LIST = {
     livingstaff = 10, -- 生命魔杖
     infernalstaff = 10, -- 地狱魔杖
 
+    -- 枝江往事
+    eileen_harrowed_cards = 10,
+
 
 
 }
@@ -114,6 +117,9 @@ local TOOL_LIST = {
     moltendarts = GetModConfigData("moltendarts"), -- 融化吹箭
     livingstaff = GetModConfigData("livingstaff"), -- 生命魔杖
     infernalstaff = GetModConfigData("infernalstaff"), -- 地狱魔杖
+
+    -- 枝江往事
+    eileen_harrowed_cards = GetModConfigData("eileen_harrowed_cards"), -- 卡牌武器
 
     -- 奇葩要求
     glasscutter = GetModConfigData("glasscutter"), -- 玻璃刀

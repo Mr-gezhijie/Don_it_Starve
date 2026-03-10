@@ -107,7 +107,8 @@ local function DoEquip(inst, tool)
     local plcotrl = inst.components.playercontroller
     if (plcotrl and plcotrl.inst and plcotrl.inst.replica and plcotrl.inst.replica.inventory) then
         hasEquipped = true;
-        inst.replica.inventory:UseItemFromInvTile(tool)
+        --inst.replica.inventory:UseItemFromInvTile(tool)
+        SendRPCToServer(RPC.EquipActionItem, tool)
     end
 end
 
@@ -119,6 +120,7 @@ local function DoUnequip(inst)
         --// 判断手中的东西，如果是火女的武器，就不卸下
         if handEquipment and IsCheckIfLighting(handEquipment) and handEquipment.prefab ~= "lighter" then
             inst.replica.inventory:UseItemFromInvTile(handEquipment)
+            --SendRPCToServer(RPC.EquipActionItem, handEquipment)
         end
     end
 end
@@ -275,7 +277,8 @@ local function CheckIfInDarkness(inst)
     local handEquipment =  GetEquippedItem(inst,EQUIPSLOTS.HANDS)
     if  handEquipment and handEquipment:HasTag("light") and handEquipment.replica.inventoryitem.classified.percentused:value() < 1 then
         if (inst and inst.replica and inst.replica.inventory) then
-                inst.replica.inventory:UseItemFromInvTile(handEquipment)
+                --inst.replica.inventory:UseItemFromInvTile(handEquipment)
+            SendRPCToServer(RPC.EquipActionItem, handEquipment)
         end
     end
 

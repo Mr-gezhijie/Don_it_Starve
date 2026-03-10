@@ -56,7 +56,7 @@ Welcome to leave a message for discussion!
 ]]
 
 author = "GEZHIJIE"
-version = "1.4.4"
+version = "1.4.5"
 
 forumthread = ""
 
@@ -655,6 +655,27 @@ configuration_options = {
             { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
         },
         default = true,
+    },
+
+    -- -------------------------------------------------------------------- mod ------------------------------------------
+    -- 枝江往事
+    {
+        name = "x2",
+        label = CHS and "mod-以下物品不切换-枝江往事" or "mod-Follow items do not switch-Zhijiang_Memories",
+        options = { {
+                        description = "",
+                        data = ""
+                    } },
+        default = ""
+    },
+    {
+        name = "eileen_harrowed_cards",
+        label = CHS and "卡牌武器" or "eileen_harrowed_cards",
+        options = {
+            { description = CHS and "禁用" or "Disable", data = false, hover = CHS and "会自动切换手杖" or "Will automatically switch the cane" },
+            { description = CHS and "启用" or "Enable", data = true, hover = CHS and "不会自动切换手杖" or "Will not automatically switch canes" }
+        },
+        default = false,
     },
 
 
