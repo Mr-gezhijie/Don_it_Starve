@@ -9,6 +9,7 @@ local Autoswitch = Class(function(self, inst)
     self.toolList = {}
     self.isStrangeAttacks= false
     self.allowedMap = {
+        ["lz_staff"] = true,  -- 加速武器
         ["spear_wathgrithr_lightning_charged"] = true,  -- 充能奔雷矛
         ["fgc_book_emo"] = true, -- 恶魔契约手杖
         ["orangestaff"] = true, -- 懒人手杖
@@ -18,6 +19,7 @@ local Autoswitch = Class(function(self, inst)
         ["balloonspeed"] = true, -- 敏捷气球
     }
     self.allowedArr = {
+        "lz_staff", -- 加速武器
         "spear_wathgrithr_lightning_charged", -- 充能奔雷矛
         "fgc_book_emo", -- 恶魔契约手杖
         "orangestaff", -- 懒人手杖

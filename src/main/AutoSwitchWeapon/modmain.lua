@@ -42,8 +42,10 @@ local WEAPON_LIST = {
     infernalstaff = 10, -- 地狱魔杖
 
     -- 枝江往事
-    eileen_harrowed_cards = 10,
+    eileen_harrowed_cards = 10, -- 卡牌
 
+    -- 荔只只
+    lz_staff = 14, -- 加速武器
 
 
 }
@@ -120,6 +122,9 @@ local TOOL_LIST = {
 
     -- 枝江往事
     eileen_harrowed_cards = GetModConfigData("eileen_harrowed_cards"), -- 卡牌武器
+
+    -- 荔只只
+    lz_staff =  GetModConfigData("lz_staff"), -- 加速武器
 
     -- 奇葩要求
     glasscutter = GetModConfigData("glasscutter"), -- 玻璃刀
